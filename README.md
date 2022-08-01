@@ -1,1 +1,1 @@
-- Hello, I am software developer. Attached here are some projects I worked on.
+- Hello, I am Software Developer. Attached here are some projects I worked on.
