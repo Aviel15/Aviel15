@@ -21,7 +21,7 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 
 - :zap: In my free time, I solve problems on GeeksforGeeks and read tech articles.
 
-- :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/-Aviel15-blue?style=flat&logo=Linkedin&logoColor=white)](www.linkedin.com/in/aviel-chanukaev), aviel.h1502@gmail.com
+- :mailbox:How to reach me: aviel.h1502@gmail.com
     ---
 
 ### :hammer_and_wrench: Languages and Tools :
