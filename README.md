@@ -1,1 +1,3 @@
-- Hello, I am Software Developer. Attached here are some projects I worked on.
+<div id="header" align="center">
+  <img src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif" width="100"/>
+</div>
