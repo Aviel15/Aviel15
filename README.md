@@ -7,7 +7,7 @@
 </div>
 <div id="badges" align="center">
   <a href="https://www.linkedin.com/in/aviel-chanukaev">
-    <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge" width="200"/>
+    <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge" width="170"/>
   </a>
 </div>
     
@@ -37,7 +37,7 @@
 </div>
     
 ### :fire: My Stats :
-![Anurag's github stats](https://github-readme-stats.vercel.app/api?username=anuraghazra)
+![Anurag's github stats](https://github-readme-stats.vercel.app/api?username=Aviel15)
 ---
     
 ### :desktop_computer: Top Lanuages :
