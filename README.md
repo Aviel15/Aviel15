@@ -7,7 +7,7 @@
 </div>
 <div id="badges" align="center">
   <p>
-  <a href="https://www.linkedin.com/[removed]" rel="nofollow noreferrer">
+  <a href="www.linkedin.com/in/aviel-chanukaev" rel="nofollow noreferrer">
     <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> 
   </a>
 </div>
