@@ -6,8 +6,9 @@
   <img src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif" width="300"/>
 </div>
 <div id="badges" align="center">
-  <a href="www.linkedin.com/in/aviel-chanukaev">
-    <img src="style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
+  <p>
+  <a href="https://www.linkedin.com/[removed]" rel="nofollow noreferrer">
+    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> 
   </a>
 </div>
     
