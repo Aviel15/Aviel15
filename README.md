@@ -41,5 +41,5 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 ---
     
 ### :desktop_computer: Top Lanuages :
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)](https://github.com/anuraghazra/github-readme-stats)
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)&theme=dark&background=000000)](https://github.com/anuraghazra/github-readme-stats)
 <img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="200"/>
