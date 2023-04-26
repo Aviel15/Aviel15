@@ -42,5 +42,8 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 
 ### :fire: My Stats :
 [![GitHub Streak](http://github-readme-streak-stats.herokuapp.com?user=Aviel15&theme=dark&background=000000)](https://git.io/streak-stats)
+        ---
+
+### :desktop_computer: Languages and Tools :
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)](https://github.com/anuraghazra/github-readme-stats)
 
