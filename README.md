@@ -6,10 +6,7 @@
   <img src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif" width="300"/>
 </div>
 <div id="badges" align="center">
-  <p>
-  <a href="www.linkedin.com/in/aviel-chanukaev" rel="nofollow noreferrer">
-    <img src="https://i.stack.imgur.com/gVE0j.png" alt="linkedin"> 
-  </a>
+  <a href="www.linkedin.com/in/aviel-chanukaev" target="blank"><img align="center" src="URL_TO_YOUR_IMAGE" height="100" /></a>
 </div>
     
 ### :woman_technologist: About Me :
