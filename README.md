@@ -10,8 +10,8 @@
     <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
   </a
 </div>
-       ---
-
+---
+    
 ### :woman_technologist: About Me :
 I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
 
@@ -42,4 +42,4 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
     
 ### :desktop_computer: Top Lanuages :
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)](https://github.com/anuraghazra/github-readme-stats)
-<img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="120"/>
+<img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="200"/>
