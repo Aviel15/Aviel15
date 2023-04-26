@@ -10,18 +10,14 @@
     <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
   </a
 </div>
-<img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="120"/>
        ---
 
 ### :woman_technologist: About Me :
 I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
-- :telescope: I’m working as a Software Engineer and contributing to frontend and backend for building web applications.
 
-- :seedling: Exploring Technical Content Writing.
+- :zap: In my free time, I solve CTF read tech articles.
 
-- :zap: In my free time, I solve problems on GeeksforGeeks and read tech articles.
-
-- :mailbox:How to reach me: aviel.h1502@gmail.com
+- :mailbox: How to reach me: aviel.h1502@gmail.com
     ---
 
 ### :hammer_and_wrench: Languages and Tools :
@@ -42,8 +38,8 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 
 ### :fire: My Stats :
 [![GitHub Streak](http://github-readme-streak-stats.herokuapp.com?user=Aviel15&theme=dark&background=000000)](https://git.io/streak-stats)
-        ---
-
+---
+    
 ### :desktop_computer: Top Lanuages :
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)](https://github.com/anuraghazra/github-readme-stats)
-
+<img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="120"/>
