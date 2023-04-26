@@ -5,16 +5,16 @@
 <div id="header" align="center">
   <img src="https://media.giphy.com/media/ZVik7pBtu9dNS/giphy.gif" width="300"/>
 </div>
-<div id="badges" align="center">
+<div id="badges">
   <a href="www.linkedin.com/in/aviel-chanukaev">
     <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
-  </a
+  </a>
 </div>
     
 ### :woman_technologist: About Me :
 - I am 18 years old a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
 
-- :top:Love to learn low level.
+- :top: Love to learn low level.
     
 - :zap: In my free time, I solve CTF read tech articles.
 
