@@ -21,7 +21,7 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 
 - :zap: In my free time, I solve problems on GeeksforGeeks and read tech articles.
 
-- :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/-Aviel15-blue?style=flat&logo=Linkedin&logoColor=white)](www.linkedin.com/in/aviel-chanukaev)
+- :mailbox:How to reach me: [![Linkedin Badge](https://img.shields.io/badge/-Aviel15-blue?style=flat&logo=Linkedin&logoColor=white)](www.linkedin.com/in/aviel-chanukaev), aviel.h1502@gmail.com
     ---
 
 ### :hammer_and_wrench: Languages and Tools :
@@ -44,6 +44,6 @@ I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTG
 [![GitHub Streak](http://github-readme-streak-stats.herokuapp.com?user=Aviel15&theme=dark&background=000000)](https://git.io/streak-stats)
         ---
 
-### :desktop_computer: Languages and Tools :
+### :desktop_computer: Top Lanuages :
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Aviel15)](https://github.com/anuraghazra/github-readme-stats)
 
