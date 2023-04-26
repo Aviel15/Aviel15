@@ -11,9 +11,9 @@
   </a
 </div>
 <img src="https://komarev.com/ghpvc/?username=Aviel15&style=flat-square&color=blue" alt="" width="120"/>
-    ---
+        ---
 
-### :woman_technologist: About Me : 
+### :woman_technologist: About Me :
 I am a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
 - :telescope: I’m working as a Software Engineer and contributing to frontend and backend for building web applications.
 
