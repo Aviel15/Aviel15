@@ -11,7 +11,7 @@
   </a>
 </div>
     
-### :woman_technologist: About Me :
+### :man_technologist: About Me :
 - I am 18 years old a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
 
 - :top: Love to learn low level.
