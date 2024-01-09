@@ -12,11 +12,11 @@
 </div>
     
 ### :man_technologist: About Me :
-- I am 18 years old a Software Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
+- I am 18 years old <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30">.
 
 - :top: Love to learn low level.
     
-- :zap: In my free time, I solve CTF read tech articles.
+- :zap: In my free time, I solve CTF and read tech articles.
 
 - :mailbox: How to reach me: aviel.h1502@gmail.com
     ---
