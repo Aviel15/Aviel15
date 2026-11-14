@@ -91,7 +91,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 ## 5. משגר המודעות (הממשק)
 
 - דף: https://claude.ai/artifact/5FGAHTubpdL7xADDKrL5kU (קוד המקור: `ad-launcher.html` בריפו `aviel15/aviel15`).
-- **תיקיית העבודה בדרייב (מקור הקבצים, לא גיטהאב):** `Mayro-Ads` (folder id `1U0e-5dkpve4hV0gmCtdX29r9ErpGmojD`). בתוכה: `ad-launcher.html`, `CLAUDE.md`, קובץ מחקר המוצרים, ותת-תיקייה `facebook-campaigner (סקיל)` (id `1E1yCziDXnV2tAFvVbVdUhxJm08_A6-7X`) עם `SKILL.md`, `steam-copy.md` ו-`facebook-campaigner.zip`.
+- **תיקיית העבודה בדרייב (מקור הקבצים, לא גיטהאב):** `קמפיינר אוטומטי` (folder id `1U0e-5dkpve4hV0gmCtdX29r9ErpGmojD`). בתוכה: `ad-launcher.html`, `CLAUDE.md`, קובץ מחקר המוצרים, ותת-תיקייה `facebook-campaigner (סקיל)` (id `1E1yCziDXnV2tAFvVbVdUhxJm08_A6-7X`) עם `SKILL.md`, `steam-copy.md` ו-`facebook-campaigner.zip`.
   - אחרי כל שינוי בסקיל או במשגר: מעלים את הגרסה החדשה לאותה תיקייה (Google Drive MCP, `create_file` עם `disableConversionToGoogleType`) ומעבירים את הישנה לפח (`trash_file`), כך שבדרייב תמיד יש גרסה אחת עדכנית.
   - ההעלאה האוטומטית למטא רצה בענן (משימה מתוזמנת), לא מהמחשב.
 - המידע נשמר ב-db של הארטיפקט. קוראים וכותבים עם `ArtifactData` ו-`url` של הדף:
