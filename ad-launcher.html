@@ -1,0 +1,996 @@
+<title>משגר מודעות</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0; --surface:#ffffff; --surface-2:#efede7; --text:#1a1917; --muted:#6b6862;
+  --border:#dedbd3; --accent:#1f5eff; --accent-ink:#ffffff; --accent-soft:#e6edff;
+  --ok:#14794a; --ok-soft:#dff3e8; --warn:#9a6200; --warn-soft:#fbefd5; --err:#b42318; --err-soft:#fde4e1;
+  --info:#3b4cca; --info-soft:#e7e9fb; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121212; --surface:#1c1c1b; --surface-2:#262624; --text:#f1efea; --muted:#a19d95;
+  --border:#34332f; --accent:#6f95ff; --accent-ink:#0b0f1a; --accent-soft:#1d2744;
+  --ok:#4fd18f; --ok-soft:#173326; --warn:#f0b54a; --warn-soft:#3a2c12; --err:#ff8a7d; --err-soft:#3d1a16;
+  --info:#9ba6ff; --info-soft:#222647; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  --bg:#121212; --surface:#1c1c1b; --surface-2:#262624; --text:#f1efea; --muted:#a19d95;
+  --border:#34332f; --accent:#6f95ff; --accent-ink:#0b0f1a; --accent-soft:#1d2744;
+  --ok:#4fd18f; --ok-soft:#173326; --warn:#f0b54a; --warn-soft:#3a2c12; --err:#ff8a7d; --err-soft:#3d1a16;
+  --info:#9ba6ff; --info-soft:#222647; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:Heebo,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5;direction:rtl}
+.wrap{max-width:760px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-right,0px)) 96px max(16px,env(safe-area-inset-left,0px))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 12px}
+header.top h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.01em}
+header.top .sub{color:var(--muted);font-size:13px}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:6px 0 10px}
+nav.tabs button{flex:1;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-weight:600;padding:10px 6px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+nav.tabs button[aria-selected="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+nav.tabs .count{font-size:12px;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:0 7px;min-width:20px}
+section.view{display:none}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin:0 0 4px;font-weight:700}
+.card .hint{color:var(--muted);font-size:13px;margin:0 0 12px}
+label.f{display:block;margin:0 0 12px}
+label.f>span{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+label.f>small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+input[type=text],input[type=url],input[type=number],select,textarea{width:100%;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{resize:vertical;min-height:72px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.ltr{direction:ltr;text-align:left}
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+@media (max-width:520px){.row.stack{flex-direction:column;gap:0}}
+.btn{font:inherit;font-weight:700;border-radius:12px;padding:12px 16px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.block{width:100%}
+.btn.small{padding:6px 10px;min-height:34px;font-size:13px;border-radius:9px}
+.btn.danger{color:var(--err);border-color:var(--err-soft)}
+.btn.danger.armed{background:var(--err);color:#fff;border-color:var(--err)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.drop{display:block;border:2px dashed var(--border);border-radius:14px;padding:22px 14px;text-align:center;cursor:pointer;background:var(--surface-2)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop strong{display:block;font-size:16px}
+.drop span{color:var(--muted);font-size:13px}
+.files{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.files li{display:flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px}
+.files li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:right}
+.files li .sz{color:var(--muted);font-variant-numeric:tabular-nums}
+.files li.bad{background:var(--err-soft);color:var(--err)}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill.pending{background:var(--warn-soft);color:var(--warn)}
+.pill.processing{background:var(--info-soft);color:var(--info)}
+.pill.done{background:var(--ok-soft);color:var(--ok)}
+.pill.error{background:var(--err-soft);color:var(--err)}
+.pill.neutral{background:var(--surface-2);color:var(--muted)}
+.banner{border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+.banner.err{background:var(--err-soft);color:var(--err)}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}
+.banner.info{background:var(--info-soft);color:var(--info)}
+.banner ul{margin:4px 0 0;padding-inline-start:18px}
+.q-item{display:flex;gap:12px;align-items:flex-start}
+.q-item video{width:72px;height:128px;object-fit:cover;border-radius:10px;background:#000;flex:none}
+.q-item .ph{width:72px;height:128px;border-radius:10px;background:var(--surface-2);flex:none;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-align:center;padding:4px}
+.q-body{flex:1;min-width:0}
+.q-title{font-weight:700;overflow-wrap:anywhere;direction:ltr;text-align:right}
+.q-meta{color:var(--muted);font-size:13px}
+.q-meta b{color:var(--text);font-weight:600}
+.q-err{color:var(--err);font-size:13px;margin-top:4px;overflow-wrap:anywhere}
+.q-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chips button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.toggle:last-child{border-bottom:0}
+.toggle .tl{font-size:14px}
+.toggle .tl small{display:block;color:var(--muted);font-size:12px;direction:ltr;text-align:right}
+.sw{display:inline-block;position:relative;width:46px;height:28px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer;position:absolute;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:999px;background:var(--border);transition:background .15s}
+.sw i::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.sw input:checked+i{background:var(--ok)}
+.sw input:checked+i::after{transform:translateX(-18px)}
+.prod{border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.prod-h{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.prod-h strong{font-size:15px}
+.prod .url{color:var(--muted);font-size:12px;direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.angle{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface-2);border-radius:10px;padding:8px 10px;margin-top:6px;font-size:14px}
+.angle .ac{color:var(--muted);font-size:12px}
+dialog{border:0;border-radius:18px;padding:0;width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--surface);color:var(--text);direction:rtl}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog form{padding:16px}
+dialog h3{margin:0 0 12px;font-size:17px}
+.dlg-actions{display:flex;gap:8px;position:sticky;bottom:0;background:var(--surface);padding-top:10px}
+.dlg-actions .btn{flex:1}
+.steps{margin:0;padding-inline-start:20px;font-size:14px}
+.steps li{margin-bottom:6px}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+.empty{color:var(--muted);text-align:center;padding:24px 8px;font-size:14px}
+.progress{height:6px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin-top:10px;display:none}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.sticky-save{position:sticky;bottom:12px;z-index:4}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:all .2s;z-index:50;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+details.how summary{cursor:pointer;font-weight:700}
+.ta-count{font-size:12px;color:var(--muted);text-align:left;direction:ltr}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>משגר מודעות</h1>
+      <div class="sub" id="syncState">מתחבר…</div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="launch" aria-selected="true">העלאה</button>
+    <button role="tab" data-tab="queue" aria-selected="false">תור <span class="count" id="pendingCount" hidden>0</span></button>
+    <button role="tab" data-tab="settings" aria-selected="false">הגדרות</button>
+  </nav>
+
+  <div id="globalBanner"></div>
+
+  <!-- ============ LAUNCH ============ -->
+  <section class="view active" id="view-launch">
+    <div id="setupBanner"></div>
+
+    <div class="card">
+      <h2>1. הסרטונים</h2>
+      <p class="hint">אפשר לבחור כמה סרטונים בבת אחת. כל סרטון = מודעה. עד 500MB לסרטון; קבצים גדולים עולים בחלקים אוטומטית. אל תסגור את הדף עד שההעלאה מסתיימת.</p>
+      <label class="drop" id="drop">
+        <input type="file" id="fileInput" accept="video/mp4,video/quicktime,video/*,image/jpeg,image/png" multiple hidden>
+        <strong>בחר סרטונים או תמונות</strong>
+        <span>או גרור לכאן (במחשב)</span>
+      </label>
+      <ul class="files" id="fileList"></ul>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-size:14px;font-weight:600">הסרטון כבר בדרייב? הדבק קישור במקום להעלות</summary>
+        <label class="f" style="margin-top:8px"><span>קישורי Google Drive (קישור בכל שורה)</span>
+          <textarea id="driveLinks" class="ltr" rows="3" placeholder="https://drive.google.com/file/d/..."></textarea>
+          <small>הקובץ צריך להיות בדרייב שלך (אני ניגש אליו דרך החיבור לדרייב).</small>
+        </label>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>2. לאן זה עולה</h2>
+      <label class="f" id="lProductWrap"><span>מוצר</span><select id="lProduct"></select></label>
+      <label class="f"><span>קונספט (אד-סט)</span><select id="lConcept"></select>
+        <small id="adsetResolved"></small>
+      </label>
+      <label class="f"><span>זווית</span><select id="lAngle"></select>
+        <small id="angleSummary"></small>
+      </label>
+      <div id="mixWarn"></div>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">להעלות לאד-סט אחר (חריג)</summary>
+        <label class="f" style="margin-top:8px"><select id="lAdset"></select></label>
+      </details>
+      <div class="row stack">
+        <label class="f"><span>סטטוס אחרי העלאה</span>
+          <select id="lStatus"><option value="PAUSED">כבויה (אני מאשר ידנית)</option><option value="ACTIVE">פעילה מיד</option></select>
+        </label>
+        <label class="f"><span>מתי להעלות</span>
+          <input type="datetime-local" id="lWhen">
+          <small id="whenHint">ריק = בהרצה הבאה</small>
+        </label>
+      </div>
+      <label class="f"><span>הערה לי (לא חובה)</span><input type="text" id="lNote" placeholder="למשל: להחליף טקסט ראשי לגרסה 2"></label>
+    </div>
+
+    <button class="btn primary block" id="submitBtn" disabled>שלח לתור</button>
+    <div class="progress" id="upProg"><i></i></div>
+    <p class="hint" id="submitHint" style="text-align:center;margin-top:8px"></p>
+  </section>
+
+  <!-- ============ QUEUE ============ -->
+  <section class="view" id="view-queue">
+    <div class="card" id="queueCta">
+      <h2>העלאה אוטומטית למטא</h2>
+      <p class="hint" id="queueCtaText">אין כרגע מודעות שממתינות.</p>
+      <button class="btn primary block" id="copyCmd">העלה עכשיו</button>
+      <p class="hint" id="usage" style="margin:10px 0 0;text-align:center"></p>
+    </div>
+    <div class="chips" id="qFilters">
+      <button data-f="all" aria-pressed="true">הכל</button>
+      <button data-f="pending" aria-pressed="false">ממתין</button>
+      <button data-f="processing" aria-pressed="false">בעבודה</button>
+      <button data-f="done" aria-pressed="false">עלה</button>
+      <button data-f="error" aria-pressed="false">שגיאה</button>
+    </div>
+    <div id="queueList"></div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="view" id="view-settings">
+    <div class="card">
+      <details class="how">
+        <summary>איך זה עובד</summary>
+        <ol class="steps" style="margin-top:10px">
+          <li>ממלאים כאן פעם אחת: חשבון, עמוד, פיקסל, אד-סטים, מוצרים וזוויות עם הטקסטים.</li>
+          <li>בכל פעם שיש קריאייטיב: לשונית "העלאה" ← בוחרים סרטונים, מוצר, זווית ואד-סט ← "שלח לתור".</li>
+          <li>כותבים לקלוד "תעלה את התור" (או שזה רץ אוטומטית לפי לוח זמנים).</li>
+          <li>קלוד מעלה את הסרטון למטא, בונה קריאייטיב עם הטקסטים של הזווית, הקישור, ה-UTM והגדרות ה-Advantage+, ויוצר מודעה. הסטטוס מתעדכן כאן בזמן אמת.</li>
+        </ol>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>חשבון מטא</h2>
+      <p class="hint">המספרים האלה קבועים. אם תשאיר ריק, קלוד ימשוך אותם מהחשבון.</p>
+      <div class="row stack">
+        <label class="f"><span>Ad Account ID</span><input type="text" id="sAccount" class="ltr" placeholder="act_123..."></label>
+        <label class="f"><span>Facebook Page ID</span><input type="text" id="sPage" class="ltr"></label>
+      </div>
+      <div class="row stack">
+        <label class="f"><span>Instagram Account ID</span><input type="text" id="sIg" class="ltr"></label>
+        <label class="f"><span>Pixel / Dataset ID</span><input type="text" id="sPixel" class="ltr"></label>
+      </div>
+      <label class="f"><span>כל העמודים שאתה מפרסם מהם (שורה לכל עמוד: <span class="mono">שם | ID</span>)</span>
+        <textarea id="sPages" rows="3"></textarea>
+        <small>בכל מוצר אפשר לבחור מאיזה עמוד המודעה יוצאת. בלי בחירה המודעה יוצאת מהעמוד הראשי שלמעלה.</small>
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>ברירות מחדל למודעה</h2>
+      <div class="row stack">
+        <label class="f"><span>כפתור (CTA)</span>
+          <select id="sCta">
+            <option value="SHOP_NOW">Shop Now · לרכישה</option>
+            <option value="ORDER_NOW">Order Now · להזמנה</option>
+            <option value="BUY_NOW">Buy Now · קנה עכשיו</option>
+            <option value="GET_OFFER">Get Offer · לקבלת ההצעה</option>
+            <option value="LEARN_MORE">Learn More · מידע נוסף</option>
+          </select>
+        </label>
+        <label class="f"><span>סטטוס ברירת מחדל</span>
+          <select id="sStatus"><option value="PAUSED">כבויה</option><option value="ACTIVE">פעילה</option></select>
+        </label>
+      </div>
+      <div class="row stack">
+        <label class="f"><span>Display link (הדומיין שמוצג במודעה)</span><input type="text" id="sDisplay" class="ltr" placeholder="mayro-il.com"></label>
+        <label class="f"><span>Domain ID (דומיין מאומת)</span><input type="text" id="sDomainId" class="ltr"></label>
+      </div>
+      <label class="f"><span>URL parameters (UTM)</span>
+        <textarea id="sUtm" class="ltr" rows="2" placeholder="utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}"></textarea>
+        <small>נכנס לשדה URL parameters של המודעה. אפשר להשתמש ב-{{ad.name}} וכו'.</small>
+      </label>
+      <label class="f"><span>תבנית שם מודעה</span>
+        <input type="text" id="sNaming" class="ltr" placeholder="{file}">
+        <small>{file} = שם הקובץ בלי סיומת. אם השם לא נגמר ב-_מספר, מתווסף _1, _2… לפי הסדר. משתנים נוספים: {product} {angle} {concept} {date} {n}</small>
+      </label>
+      <label class="f"><span>גילוי תוכן AI (חובת שקיפות של מטא)</span>
+        <select id="sAi">
+          <option value="">לשאול אותי בכל העלאה</option>
+          <option value="OPT_OUT">לא מסומן כ-AI</option>
+          <option value="OPT_IN">מסומן כנוצר ב-AI</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>קונספטים</h2>
+      <p class="hint">כל קונספט = אד-סט נפרד בקמפיין הטסטים של המוצר. שורה לכל קונספט: <span class="mono">קוד | שם האד-סט</span>. את הקמפיין, האד-סטים והתקציבים אתה פותח בעצמך; קלוד רק מכניס מודעות.</p>
+      <label class="f"><textarea id="sConcepts" rows="4" class="ltr" placeholder="VO | Voice over"></textarea></label>
+    </div>
+
+    <div class="card">
+      <h2>אד-סטים</h2>
+      <p class="hint">האד-סטים שאתה מעלה אליהם בדרך כלל. שורה לכל אחד: <span class="mono">שם | ID</span></p>
+      <label class="f"><textarea id="sAdsets" rows="4" placeholder="טסטים בוקסר | 120212345678901234&#10;סקייל ברודי | 120298765432109876"></textarea></label>
+      <div class="row stack">
+        <label class="f"><span>קמפיין לטסטים (לאד-סט חדש)</span><input type="text" id="sTestCampaign" class="ltr" placeholder="Campaign ID"></label>
+        <label class="f"><span>תקציב יומי ברירת מחדל (₪)</span><input type="number" id="sBudget" inputmode="decimal"></label>
+      </div>
+      <label class="f"><span>אד-סט חדש מועתק מ- (Ad Set ID תבנית)</span>
+        <input type="text" id="sTemplateAdset" class="ltr" placeholder="אד-סט שממנו מעתיקים טרגוט, מיקומים ואופטימיזציה">
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>אופטימיזציות Advantage+ קריאייטיב</h2>
+      <p class="hint">לפי ההגדרה שלך הכל כבוי. ירוק = מטא מורשית להפעיל.</p>
+      <p class="hint" style="margin-top:-6px">קבוע בכל מודעה: Create ad · Manual upload · Single image or video · עמוד Mayro · אינסטגרם mayro.il · Threads דרך חשבון האינסטגרם · WhatsApp דרך עמוד הפייסבוק.</p>
+      <div id="advList"></div>
+    </div>
+
+    <div class="sticky-save"><button class="btn primary block" id="saveSettings">שמור הגדרות</button></div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="prod-h" style="margin-bottom:8px">
+        <h2 style="margin:0">מוצרים וזוויות</h2>
+        <button class="btn small" id="addProduct">+ מוצר</button>
+      </div>
+      <p class="hint">לכל מוצר: קישור לדף. לכל זווית: עד 5 טקסטים ראשיים, עד 5 כותרות ותיאורים.</p>
+      <div id="productList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Product dialog -->
+<dialog id="dlgProduct">
+  <form method="dialog" id="formProduct">
+    <h3 id="dlgProductTitle">מוצר</h3>
+    <label class="f"><span>שם המוצר</span><input type="text" name="name" required placeholder="בוקסר במבוק"></label>
+    <label class="f"><span>קוד קצר לשם המודעה</span><input type="text" name="code" class="ltr" placeholder="BOXER"></label>
+    <label class="f"><span>קישור לדף המוצר</span><input type="url" name="url" class="ltr" required placeholder="https://mayro-il.com/products/..."></label>
+    <label class="f"><span>קמפיין הטסטים של המוצר (Campaign ID)</span><input type="text" name="campaignId" class="ltr" placeholder="ריק = קלוד יפתח TESTING | ABO | שם המוצר"></label>
+    <div id="conceptAdsetsBox"></div>
+    <label class="f"><span>אד-סט ברירת מחדל (לא חובה)</span><select name="adsetId"></select></label>
+    <label class="f"><span>עמוד פייסבוק שממנו המודעה יוצאת</span><select name="pageId"></select></label>
+    <label class="f"><span>UTM ייעודי (לא חובה, דורס את הכללי)</span><input type="text" name="urlTags" class="ltr"></label>
+    <div class="dlg-actions">
+      <button class="btn" value="cancel" formnovalidate>ביטול</button>
+      <button class="btn danger" type="button" id="delProduct" hidden>מחק</button>
+      <button class="btn primary" value="save">שמור</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Angle dialog -->
+<dialog id="dlgAngle">
+  <form method="dialog" id="formAngle">
+    <h3 id="dlgAngleTitle">זווית</h3>
+    <div class="row stack">
+      <label class="f"><span>שם הזווית</span><input type="text" name="name" required placeholder="נוחות כל היום"></label>
+      <label class="f"><span>קוד קצר</span><input type="text" name="code" class="ltr" placeholder="COMFORT"></label>
+    </div>
+    <div id="ptBox"></div>
+    <div id="hlBox"></div>
+    <label class="f"><span>תיאורים (Description), שורה לכל אחד</span><textarea name="descriptions" rows="2" placeholder="משלוח חינם · 30 יום החזר כספי"></textarea></label>
+    <div class="row stack">
+      <label class="f"><span>CTA ייעודי</span>
+        <select name="cta"><option value="">כמו בהגדרות</option><option value="SHOP_NOW">Shop Now</option><option value="ORDER_NOW">Order Now</option><option value="BUY_NOW">Buy Now</option><option value="GET_OFFER">Get Offer</option><option value="LEARN_MORE">Learn More</option></select>
+      </label>
+      <label class="f"><span>קישור ייעודי (לנדינג אחר)</span><input type="url" name="url" class="ltr" placeholder="ריק = הקישור של המוצר"></label>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn" value="cancel" formnovalidate>ביטול</button>
+      <button class="btn danger" type="button" id="delAngle" hidden>מחק</button>
+      <button class="btn primary" value="save">שמור</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+const MAX_FILE = 500 * 1024 * 1024;   // per video
+const CHUNK = 19 * 1024 * 1024;       // platform cap is 20 MiB per stored piece
+const META_CAP = 100 * 1024 * 1024;   // above this Claude compresses before sending to Meta
+const ADV = [
+  ["creative_setup","Creative setup: Site links, Summaries, Website highlights"],
+  ["show_products","Show products (מוצרים מהקטלוג)"],
+  ["advantage_plus_creative","Advantage+ creative enhancements (כל ה-5: Sticker CTA, Video touch-ups, Text improvements ועוד)"],
+  ["essential_enhancements","Essential enhancements (Relevant comments, Enhance CTA, Add video effects)"],
+  ["related_media","Related media (0/10)"],
+  ["multi_advertiser_ads","Multi-advertiser ads"],
+  ["optimize_website_destination","Personalized destinations: Optimize website destination"],
+  ["product_browsing","Personalized destinations: Product browsing"],
+  ["browser_add_ons","Personalized destinations: Browser add-ons"],
+];
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs || {})){
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "text") el.textContent = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()){ if (c == null || c === false) continue; el.append(c instanceof Node ? c : document.createTextNode(String(c))); }
+  return el;
+}
+const fmtMB = b => (b/1048576).toFixed(1) + "MB";
+const fmtTime = t => { if(!t) return ""; const d = new Date(t); return d.toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit"}) + " " + d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"}); };
+let toastT; function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
+function armDelete(btn, fn){ btn.addEventListener("click", e => { e.preventDefault(); if (btn.classList.contains("armed")) { fn(); btn.classList.remove("armed"); btn.textContent = btn.dataset.l; return; } btn.dataset.l = btn.textContent; btn.classList.add("armed"); btn.textContent = "בטוח?"; setTimeout(()=>{ if(btn.classList.contains("armed")){ btn.classList.remove("armed"); btn.textContent = btn.dataset.l; } }, 3000); }); }
+
+/* ---------- state ---------- */
+let db = null, assets = null, userNs = null, myId = null;
+const S = { config:null, products:[], angles:[], queue:[], files:[], qFilter:"all", loaded:{config:false,products:false,angles:false,queue:false} };
+
+/* ---------- tabs ---------- */
+$$("nav.tabs button").forEach(b => b.addEventListener("click", () => {
+  $$("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x===b ? "true":"false"));
+  $$("section.view").forEach(v => v.classList.toggle("active", v.id === "view-" + b.dataset.tab));
+  try { localStorage.setItem("al_tab", b.dataset.tab); } catch(e){}
+}));
+try { const t = localStorage.getItem("al_tab"); if (t) { const b = $(`nav.tabs button[data-tab="${t}"]`); b && b.click(); } } catch(e){}
+
+/* ---------- advantage toggles ---------- */
+function renderAdv(){
+  const box = $("#advList"); box.textContent = "";
+  const on = (S.config && S.config.advantageOn) || {};
+  for (const [k,label] of ADV){
+    box.append(h("div",{class:"toggle"},
+      h("div",{class:"tl"}, label),
+      h("label",{class:"sw"}, h("input",{type:"checkbox","data-adv":k, checked: !!on[k]}), h("i"))
+    ));
+  }
+}
+
+/* ---------- settings form ---------- */
+const parseAdsets = txt => txt.split("\n").map(l => l.trim()).filter(Boolean).map(l => { const p = l.split("|"); return p.length>1 ? {name:p[0].trim(), id:p.slice(1).join("|").trim()} : {name:l, id:l}; }).filter(a => a.id);
+const parseConcepts = txt => txt.split("\n").map(l => l.split("|").map(x => x.trim())).filter(a => a[0]).map(a => ({key:a[0], name:a[1] || a[0], budget: Number(a[2]) || null}));
+function fillSettings(){
+  const c = S.config || {};
+  $("#sAccount").value = c.adAccountId || "";
+  $("#sPage").value = c.pageId || "";
+  $("#sIg").value = c.igUserId || "";
+  $("#sPixel").value = c.pixelId || "";
+  $("#sCta").value = c.cta || "SHOP_NOW";
+  $("#sStatus").value = c.defaultStatus || "PAUSED";
+  $("#sDisplay").value = c.displayLink || "";
+  $("#sUtm").value = c.urlTags || "";
+  $("#sNaming").value = c.naming || "";
+  $("#sAi").value = c.aiDisclosure || "";
+  $("#sAdsets").value = (c.adSets || []).map(a => `${a.name} | ${a.id}`).join("\n");
+  $("#sPages").value = (c.pages || []).map(a => `${a.name} | ${a.id}`).join("\n");
+  $("#sConcepts").value = (c.concepts || []).map(x => `${x.key} | ${x.name}`).join("\n");
+  $("#sDomainId").value = c.domainId || "";
+  $("#sTestCampaign").value = c.testCampaignId || "";
+  $("#sBudget").value = c.defaultDailyBudget || "";
+  $("#sTemplateAdset").value = c.templateAdSetId || "";
+  renderAdv();
+}
+$("#saveSettings").addEventListener("click", async () => {
+  if (!db) return toast("אין חיבור למאגר");
+  const advantageOn = {};
+  $$("[data-adv]").forEach(i => { advantageOn[i.dataset.adv] = i.checked; });
+  const data = {
+    adAccountId: $("#sAccount").value.trim(),
+    pageId: $("#sPage").value.trim(),
+    igUserId: $("#sIg").value.trim(),
+    pixelId: $("#sPixel").value.trim(),
+    cta: $("#sCta").value,
+    defaultStatus: $("#sStatus").value,
+    displayLink: $("#sDisplay").value.trim(),
+    urlTags: $("#sUtm").value.trim(),
+    naming: $("#sNaming").value.trim() || "{file}",
+    aiDisclosure: $("#sAi").value,
+    adSets: parseAdsets($("#sAdsets").value),
+    pages: parseAdsets($("#sPages").value),
+    concepts: parseConcepts($("#sConcepts").value),
+    domainId: $("#sDomainId").value.trim(),
+    testCampaignId: $("#sTestCampaign").value.trim(),
+    defaultDailyBudget: Number($("#sBudget").value) || null,
+    templateAdSetId: $("#sTemplateAdset").value.trim(),
+    advantageOn,
+    updatedAt: Date.now()
+  };
+  const btn = $("#saveSettings"); btn.disabled = true;
+  try { await db.doc("config/main").set(data); toast("ההגדרות נשמרו"); }
+  catch(e){ toast("שמירה נכשלה: " + (e.message || e.code)); }
+  finally { btn.disabled = false; }
+});
+
+/* ---------- products & angles ---------- */
+let editingProduct = null, editingAngle = null, angleProductId = null;
+function adsetOptions(sel, value, withNew){
+  sel.textContent = "";
+  sel.append(h("option",{value:""}, withNew ? "בחר אד-סט" : "ללא"));
+  for (const a of (S.config && S.config.adSets) || []) sel.append(h("option",{value:a.id}, a.name));
+  if (withNew) sel.append(h("option",{value:"__new"}, "+ אד-סט חדש לבאץ' הזה"));
+  sel.value = value || "";
+}
+function renderProducts(){
+  const box = $("#productList"); box.textContent = "";
+  if (!S.products.length){ box.append(h("div",{class:"empty"},"עוד אין מוצרים. לחץ \"+ מוצר\".")); return; }
+  for (const p of S.products){
+    const angles = S.angles.filter(a => a.productId === p.id);
+    const card = h("div",{class:"prod"},
+      h("div",{class:"prod-h"},
+        h("strong",{text:p.name || "(ללא שם)"}),
+        h("div",{style:"display:flex;gap:6px"},
+          h("button",{class:"btn small",onclick:()=>openAngle(p.id,null)},"+ זווית"),
+          h("button",{class:"btn small",onclick:()=>openProduct(p)},"עריכה"))
+      ),
+      h("div",{class:"url",text:p.url || "אין קישור"})
+    );
+    if (!angles.length) card.append(h("div",{class:"angle"}, h("span",{class:"ac"},"אין זוויות עדיין")));
+    for (const a of angles){
+      const n = (a.primaryTexts||[]).length, m = (a.headlines||[]).length;
+      card.append(h("div",{class:"angle"},
+        h("div",null, h("div",{text:a.name}), h("div",{class:"ac"}, `${n} טקסטים · ${m} כותרות`)),
+        h("button",{class:"btn small",onclick:()=>openAngle(p.id,a)},"עריכה")));
+    }
+    box.append(card);
+  }
+}
+function openProduct(p){
+  editingProduct = p;
+  const f = $("#formProduct");
+  $("#dlgProductTitle").textContent = p ? "עריכת מוצר" : "מוצר חדש";
+  f.name.value = p?.name || ""; f.code.value = p?.code || ""; f.url.value = p?.url || ""; f.urlTags.value = p?.urlTags || "";
+  adsetOptions(f.adsetId, p?.adsetId, false);
+  f.campaignId.value = p?.campaignId || "";
+  const cb = $("#conceptAdsetsBox"); cb.textContent = "";
+  const concepts = (S.config && S.config.concepts) || [];
+  if (concepts.length) cb.append(h("div",{style:"font-size:13px;font-weight:600;margin-bottom:4px"},"אד-סט לכל קונספט (ריק = ייפתח אוטומטית בהעלאה הראשונה)"));
+  for (const c of concepts){
+    const inp = h("input",{type:"text",class:"ltr","data-concept":c.key,placeholder:"Ad Set ID"}); inp.value = (p?.conceptAdsets || {})[c.key] || "";
+    cb.append(h("label",{class:"f"}, h("span",{text:c.name}), inp));
+  }
+  f.pageId.textContent = ""; f.pageId.append(h("option",{value:""},"העמוד הראשי"));
+  for (const pg of (S.config && S.config.pages) || []) f.pageId.append(h("option",{value:pg.id}, pg.name));
+  f.pageId.value = p?.pageId || "";
+  $("#delProduct").hidden = !p;
+  $("#dlgProduct").showModal();
+}
+$("#addProduct").addEventListener("click", () => openProduct(null));
+$("#dlgProduct").addEventListener("close", async () => {
+  if ($("#dlgProduct").returnValue !== "save" || !db) return;
+  const f = $("#formProduct");
+  const data = { name:f.name.value.trim(), code:f.code.value.trim(), url:f.url.value.trim(), adsetId:f.adsetId.value, pageId:f.pageId.value, campaignId:f.campaignId.value.trim(), conceptAdsets: Object.fromEntries($$("[data-concept]").map(i => [i.dataset.concept, i.value.trim()]).filter(x => x[1])), urlTags:f.urlTags.value.trim(), updatedAt:Date.now() };
+  try {
+    if (editingProduct) await db.collection("products").doc(editingProduct.id).set(data);
+    else await db.collection("products").add({...data, createdAt:Date.now()});
+    toast("המוצר נשמר");
+  } catch(e){ toast("שמירה נכשלה: " + (e.message||e.code)); }
+});
+armDelete($("#delProduct"), async () => {
+  if (!editingProduct) return;
+  $("#dlgProduct").close("cancel");
+  try { await db.collection("products").doc(editingProduct.id).delete(); toast("המוצר נמחק"); } catch(e){ toast("מחיקה נכשלה"); }
+});
+
+function buildMulti(boxId, label, values, kind){
+  const box = $(boxId); box.textContent = "";
+  box.append(h("div",{style:"font-size:13px;font-weight:600;margin-bottom:4px"}, label));
+  for (let i=0;i<5;i++){
+    const v = values[i] || "";
+    if (kind === "ta"){
+      const ta = h("textarea",{rows: i===0 ? 5 : 3, "data-multi":boxId, placeholder: i===0 ? "טקסט ראשי 1 (חובה)" : `וריאציה ${i+1} (לא חובה)`});
+      ta.value = v;
+      const cnt = h("div",{class:"ta-count"}, v.length + " תווים");
+      ta.addEventListener("input", () => cnt.textContent = ta.value.length + " תווים");
+      box.append(h("div",{style:"margin-bottom:8px"}, ta, cnt));
+    } else {
+      const inp = h("input",{type:"text","data-multi":boxId, placeholder: i===0 ? "כותרת 1" : `כותרת ${i+1} (לא חובה)`, maxlength:"255"});
+      inp.value = v;
+      box.append(h("div",{style:"margin-bottom:6px"}, inp));
+    }
+  }
+}
+const readMulti = boxId => $$(`[data-multi="${boxId}"]`).map(e => e.value.trim()).filter(Boolean);
+function openAngle(productId, a){
+  editingAngle = a; angleProductId = productId;
+  const f = $("#formAngle");
+  const p = S.products.find(x => x.id === productId);
+  $("#dlgAngleTitle").textContent = (a ? "עריכת זווית" : "זווית חדשה") + (p ? " · " + p.name : "");
+  f.name.value = a?.name || ""; f.code.value = a?.code || ""; f.cta.value = a?.cta || ""; f.url.value = a?.url || "";
+  f.descriptions.value = (a?.descriptions || []).join("\n");
+  buildMulti("#ptBox", "טקסטים ראשיים (Primary text), עד 5", a?.primaryTexts || [], "ta");
+  buildMulti("#hlBox", "כותרות (Headline), עד 5", a?.headlines || [], "in");
+  $("#delAngle").hidden = !a;
+  $("#dlgAngle").showModal();
+}
+$("#dlgAngle").addEventListener("close", async () => {
+  if ($("#dlgAngle").returnValue !== "save" || !db) return;
+  const f = $("#formAngle");
+  const data = {
+    productId: angleProductId, name:f.name.value.trim(), code:f.code.value.trim(),
+    primaryTexts: readMulti("#ptBox").slice(0,5), headlines: readMulti("#hlBox").slice(0,5),
+    descriptions: f.descriptions.value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,5),
+    cta: f.cta.value, url: f.url.value.trim(), updatedAt: Date.now()
+  };
+  if (!data.primaryTexts.length) { toast("חסר טקסט ראשי. הזווית לא נשמרה"); return; }
+  try {
+    if (editingAngle) await db.collection("angles").doc(editingAngle.id).set(data);
+    else await db.collection("angles").add({...data, createdAt:Date.now()});
+    toast("הזווית נשמרה");
+  } catch(e){ toast("שמירה נכשלה: " + (e.message||e.code)); }
+});
+armDelete($("#delAngle"), async () => {
+  if (!editingAngle) return;
+  $("#dlgAngle").close("cancel");
+  try { await db.collection("angles").doc(editingAngle.id).delete(); toast("הזווית נמחקה"); } catch(e){ toast("מחיקה נכשלה"); }
+});
+
+/* ---------- launch form ---------- */
+function renderLaunchSelects(){
+  const ps = $("#lProduct"), prevP = ps.value;
+  ps.textContent = "";
+  ps.append(h("option",{value:""}, S.products.length ? "בחר מוצר" : "אין מוצרים. הוסף בהגדרות"));
+  for (const p of S.products) ps.append(h("option",{value:p.id}, p.name));
+  if (prevP && S.products.some(p=>p.id===prevP)) ps.value = prevP;
+  else { try { const last = localStorage.getItem("al_lastProduct"); if (last && S.products.some(p=>p.id===last)) ps.value = last; } catch(e){} }
+  if (S.products.length === 1) ps.value = S.products[0].id;
+  $("#lProductWrap").hidden = S.products.length === 1;
+  renderAngleSelect();
+  const cs = $("#lConcept"), prevC = cs.value;
+  cs.textContent = "";
+  const concepts = (S.config && S.config.concepts) || [];
+  cs.append(h("option",{value:""}, concepts.length ? "בחר קונספט" : "אין קונספטים. הוסף בהגדרות"));
+  for (const c of concepts) cs.append(h("option",{value:c.key}, c.name));
+  if (prevC && concepts.some(c=>c.key===prevC)) cs.value = prevC;
+  const as = $("#lAdset"), prevA = as.value;
+  adsetOptions(as, prevA, false);
+  as.options[0].textContent = "לפי הקונספט (רגיל)";
+  if (!$("#lStatus").dataset.touched) $("#lStatus").value = (S.config && S.config.defaultStatus) || "PAUSED";
+  updateResolved();
+}
+function renderAngleSelect(){
+  const pid = $("#lProduct").value, sel = $("#lAngle"), prev = sel.value;
+  const angles = S.angles.filter(a => a.productId === pid);
+  sel.textContent = "";
+  sel.append(h("option",{value:""}, !pid ? "בחר קודם מוצר" : angles.length ? "בחר זווית" : "אין זוויות למוצר הזה"));
+  for (const a of angles) sel.append(h("option",{value:a.id}, a.name));
+  if (prev && angles.some(a=>a.id===prev)) sel.value = prev;
+  else if (angles.length === 1) sel.value = angles[0].id;
+  updateAngleSummary();
+}
+function updateAngleSummary(){
+  const a = S.angles.find(x => x.id === $("#lAngle").value);
+  $("#angleSummary").textContent = a ? `${(a.primaryTexts||[]).length} טקסטים ראשיים · ${(a.headlines||[]).length} כותרות · ${a.cta || S.config?.cta || "SHOP_NOW"}` : "";
+}
+$("#lProduct").addEventListener("change", () => {
+  try { localStorage.setItem("al_lastProduct", $("#lProduct").value); } catch(e){}
+  renderAngleSelect();
+  updateResolved();
+});
+$("#lConcept").addEventListener("change", () => { updateResolved(); renderFiles(); });
+function resolveTarget(){
+  const p = S.products.find(x=>x.id===$("#lProduct").value);
+  const c = ((S.config && S.config.concepts) || []).find(x => x.key === $("#lConcept").value);
+  const override = $("#lAdset").value;
+  if (override) return { adSetId: override, adSetName: ((S.config?.adSets)||[]).find(x=>x.id===override)?.name || override, concept: c, product: p };
+  if (!p || !c) return { concept: c, product: p };
+  const id = (p.conceptAdsets || {})[c.key];
+  if (id) return { adSetId: id, adSetName: c.name, concept: c, product: p };
+  return { newAdSet: true, concept: c, product: p };
+}
+function updateResolved(){
+  const t = resolveTarget(), el = $("#adsetResolved");
+  if (t.adSetId) el.textContent = `ייכנס לאד-סט: ${t.adSetName} (${t.adSetId})`;
+  else if (t.newAdSet) el.textContent = `קלוד יכניס לאד-סט "${t.concept.name}" בקמפיין הטסטים של ${t.product.name}. אם הוא עוד לא קיים, המודעות ימתינו עד שתפתח אותו.`;
+  else el.textContent = "";
+  validateLaunch();
+}
+$("#lAngle").addEventListener("change", () => { updateAngleSummary(); validateLaunch(); });
+$("#lAdset").addEventListener("change", updateResolved);
+$("#lStatus").addEventListener("change", () => { $("#lStatus").dataset.touched = "1"; });
+$("#driveLinks").addEventListener("input", validateLaunch);
+
+function setFiles(list){
+  for (const f of list){ if (!S.files.some(x => x.name===f.name && x.size===f.size)) S.files.push(f); }
+  renderFiles(); validateLaunch();
+}
+function renderFiles(){
+  const ul = $("#fileList"); ul.textContent = "";
+  const names = adNames(S.files.filter(f => f.size <= MAX_FILE));
+  S.files.forEach((f,i) => {
+    const bad = f.size > MAX_FILE;
+    const parts = Math.ceil(f.size / CHUNK);
+    const note = bad ? "מעל 500MB · דרך Drive" : fmtMB(f.size) + (parts > 1 ? ` · ${parts} חלקים` : "") + (f.size > META_CAP ? " · יידחס למטא" : "");
+    ul.append(h("li",{class: bad ? "bad" : ""},
+      h("span",{class:"nm"}, h("div",{text: names.get(f) || f.name}), names.get(f) ? h("div",{style:"font-size:11px;color:var(--muted)",text:f.name}) : null),
+      h("span",{class:"sz"}, note),
+      h("button",{class:"btn small",type:"button","aria-label":"הסר",onclick:(e)=>{e.preventDefault();S.files.splice(i,1);renderFiles();validateLaunch();}},"✕")));
+  });
+}
+$("#fileInput").addEventListener("change", e => { setFiles([...e.target.files]); e.target.value = ""; });
+const drop = $("#drop");
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => setFiles([...e.dataTransfer.files].filter(f => f.type.startsWith("video/") || f.type.startsWith("image/"))));
+
+let uploading = false;
+window.addEventListener("beforeunload", e => { if (uploading) { e.preventDefault(); e.returnValue = ""; } });
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function withRetry(fn, tries = 3){
+  let last;
+  for (let i = 0; i < tries; i++){
+    try { return await fn(); } catch(e){ last = e; if (["invalid_request","too_large","unsupported_type","not_granted"].includes(e && e.code)) break; await sleep(1500 * (i+1)); }
+  }
+  throw last;
+}
+async function sha256Hex(buf){
+  try { const d = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join(""); } catch(e){ return null; }
+}
+function videoMime(f){
+  if (["video/mp4","video/quicktime","image/jpeg","image/png"].includes(f.type)) return f.type;
+  if (/\.png$/i.test(f.name)) return "image/png";
+  if (/\.jpe?g$/i.test(f.name)) return "image/jpeg";
+  return /\.mov$/i.test(f.name) ? "video/quicktime" : "video/mp4";
+}
+async function uploadChunked(file, onProgress){
+  const mime = videoMime(file), n = Math.max(1, Math.ceil(file.size / CHUNK)), chunks = [];
+  try {
+    for (let i = 0; i < n; i++){
+      const start = i * CHUNK, end = Math.min(file.size, start + CHUNK);
+      const buf = await file.slice(start, end).arrayBuffer();
+      const blob = new Blob([buf], {type: mime});
+      onProgress && onProgress(i+1, n, start);
+      const r = await withRetry(() => assets.upload(blob, {type: mime}));
+      if (r.sizeBytes !== end - start) throw {code:"size_mismatch", message:"חלק נשמר בגודל שגוי"};
+      chunks.push({ id: r.id, size: end - start, sha256: await sha256Hex(buf) });
+      onProgress && onProgress(i+1, n, end);
+    }
+  } catch(e){
+    for (const c of chunks){ try { await assets.delete(c.id); } catch(_){} }
+    throw e;
+  }
+  return { chunks, mime };
+}
+function capturePoster(file){
+  return new Promise(resolve => {
+    let url; const v = document.createElement("video");
+    const done = b => { try { URL.revokeObjectURL(url); } catch(e){} resolve(b); };
+    const t = setTimeout(() => done(null), 8000);
+    v.muted = true; v.playsInline = true; v.preload = "auto";
+    v.onloadeddata = () => { try { v.currentTime = Math.min(1, (v.duration || 2) / 3); } catch(e){ clearTimeout(t); done(null); } };
+    v.onseeked = () => {
+      try {
+        const w = v.videoWidth, hh = v.videoHeight; if (!w || !hh) { clearTimeout(t); return done(null); }
+        const scale = Math.min(1, 1080 / Math.max(w, hh));
+        const c = document.createElement("canvas"); c.width = Math.round(w*scale); c.height = Math.round(hh*scale);
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(b => { clearTimeout(t); done(b); }, "image/jpeg", 0.85);
+      } catch(e){ clearTimeout(t); done(null); }
+    };
+    v.onerror = () => { clearTimeout(t); done(null); };
+    url = URL.createObjectURL(file); v.src = url;
+  });
+}
+function whenMs(){ const v = $("#lWhen").value; if (!v) return null; const t = new Date(v).getTime(); return isNaN(t) ? null : t; }
+function updateWhen(){
+  const t = whenMs();
+  $("#whenHint").textContent = !t ? "ריק = בהרצה הבאה" : t < Date.now() ? "השעה כבר עברה, יעלה בהרצה הבאה" : "יעלה ב-" + fmtTime(t);
+}
+$("#lWhen").addEventListener("input", updateWhen);
+const isImageFile = f => (f.type || "").startsWith("image/") || /\.(jpe?g|png)$/i.test(f.name);
+function adNames(files){
+  const pat = (S.config && S.config.naming) || "{file}";
+  const p = S.products.find(x=>x.id===$("#lProduct").value), a = S.angles.find(x=>x.id===$("#lAngle").value);
+  const c = ((S.config && S.config.concepts) || []).find(x => x.key === $("#lConcept").value);
+  const d = new Date(), date = String(d.getDate()).padStart(2,"0") + String(d.getMonth()+1).padStart(2,"0");
+  let n = 0; const out = new Map();
+  for (const f of files){
+    let base = f.name.replace(/\.[^.]+$/, "").trim();
+    n++;
+    let name = pat.replace(/\{file\}/g, base).replace(/\{product\}/g, p?.code || p?.name || "").replace(/\{angle\}/g, a?.code || a?.name || "")
+      .replace(/\{concept\}/g, c?.key || "").replace(/\{date\}/g, date).replace(/\{n\}/g, String(n));
+    if (!/_\d+$/.test(name)) name = name + "_" + n;
+    out.set(f, name);
+  }
+  return out;
+}
+function renderMixWarn(){
+  const box = $("#mixWarn"); box.textContent = "";
+  const c = $("#lConcept").value; if (!c) return;
+  const imgs = S.files.filter(isImageFile).length, vids = S.files.length - imgs;
+  const staticConcept = /IMG|STATIC/i.test(c);
+  if (staticConcept && vids) box.append(h("div",{class:"banner warn"},"בחרת קונספט של תמונות אבל יש סרטונים ברשימה. לפי השיטה, תמונה וסרטון לא נכנסים לאותו אד-סט."));
+  else if (!staticConcept && imgs) box.append(h("div",{class:"banner warn"},"יש תמונות ברשימה אבל הקונספט הוא של סרטונים. לפי השיטה, תמונה וסרטון לא נכנסים לאותו אד-סט."));
+}
+const driveList = () => $("#driveLinks").value.split("\n").map(s=>s.trim()).filter(s => /^https?:\/\//.test(s));
+function validateLaunch(){
+  renderMixWarn();
+  const okFiles = S.files.filter(f => f.size <= MAX_FILE).length + driveList().length;
+  const t = resolveTarget();
+  const adset = !!(t.adSetId || t.newAdSet);
+  const ok = !!db && !!assets && okFiles > 0 && $("#lProduct").value && $("#lAngle").value && adset;
+  $("#submitBtn").disabled = !ok;
+  $("#submitBtn").textContent = okFiles ? `שלח ${okFiles} ${okFiles===1?"מודעה":"מודעות"} לתור` : "שלח לתור";
+  const ang = S.angles.find(x => x.id === $("#lAngle").value);
+  const noCopy = ang && !(ang.primaryTexts || []).length;
+  if (noCopy) $("#submitBtn").disabled = true;
+  let hint = "";
+  if (db && !assets) hint = "אין הרשאת העלאת קבצים בתצוגה הזו (רק לעורכים).";
+  else if (!okFiles) hint = "בחר לפחות סרטון או תמונה אחת.";
+  else if (!$("#lProduct").value) hint = "בחר מוצר.";
+  else if (!$("#lAngle").value) hint = "בחר זווית.";
+  else if (noCopy) hint = "לזווית הזו עוד אין טקסט ראשי. הוסף בהגדרות.";
+  else if (!$("#lConcept").value && !$("#lAdset").value) hint = "בחר קונספט.";
+  else if (!adset) hint = "בחר קונספט.";
+  $("#submitHint").textContent = hint;
+}
+
+$("#submitBtn").addEventListener("click", async () => {
+  const btn = $("#submitBtn"); btn.disabled = true;
+  const prog = $("#upProg"), bar = prog.querySelector("i"); prog.style.display = "block"; bar.style.width = "0";
+  const files = S.files.filter(f => f.size <= MAX_FILE), links = driveList();
+  const totalBytes = files.reduce((n,f)=>n+f.size,0);
+  try {
+    const u = (await assets.list()).usage;
+    if (u && u.maxBytes && u.bytes + totalBytes > u.maxBytes){
+      $("#globalBanner").replaceChildren(h("div",{class:"banner err"}, `אין מספיק מקום באחסון של המשגר (${fmtMB(u.maxBytes - u.bytes)} פנויים, צריך ${fmtMB(totalBytes)}). הסר פריטים מהתור או בקש מקלוד לנקות סרטונים שכבר עלו.`));
+      prog.style.display = "none"; validateLaunch(); return;
+    }
+  } catch(e){}
+  uploading = true;
+  const total = files.length + links.length;
+  const p = S.products.find(x=>x.id===$("#lProduct").value), a = S.angles.find(x=>x.id===$("#lAngle").value);
+  const tg = resolveTarget();
+  const batchId = "b" + Date.now().toString(36);
+  const base = {
+    batchId, productId:p.id, productName:p.name, angleId:a.id, angleName:a.name,
+    conceptKey: tg.concept?.key || "", conceptName: tg.concept?.name || "",
+    adSetId: tg.adSetId || "", adSetName: tg.adSetName || "",
+    findAdSet: tg.newAdSet ? { name: tg.concept.name, campaignId: p.campaignId || "" } : null,
+    scheduledAt: whenMs(),
+    launchStatus: $("#lStatus").value, note: $("#lNote").value.trim(),
+    status:"pending", createdAt: Date.now(), createdBy: myId || null
+  };
+  let done = 0, failed = [], sentBytes = 0;
+  const names = adNames(files);
+  for (const f of files){
+    const label = `מעלה ${done+1}/${total}: ${f.name}`;
+    $("#submitHint").textContent = label;
+    try {
+      const up = await uploadChunked(f, (pi, pn, bytes) => {
+        $("#submitHint").textContent = pn > 1 ? `${label} · חלק ${pi}/${pn}` : label;
+        bar.style.width = (((sentBytes + bytes) / Math.max(totalBytes,1)) * 100 * (files.length/total)) + "%";
+      });
+      let posterAssetId = null;
+      if (f.type.startsWith("video/") || /\.(mp4|mov)$/i.test(f.name)) try { const poster = await capturePoster(f); if (poster) posterAssetId = (await withRetry(() => assets.upload(poster, {type:"image/jpeg"}))).id; } catch(e){}
+      await db.collection("queue").add({ ...base, source:"asset", chunks: up.chunks, videoAssetId: up.chunks.length === 1 && up.mime.startsWith("video/") ? up.chunks[0].id : null,
+        posterAssetId: posterAssetId || (up.mime.startsWith("image/") && up.chunks.length === 1 ? up.chunks[0].id : null), mediaType: up.mime.startsWith("image/") ? "image" : "video", fileName:f.name, adName: names.get(f), mimeType: up.mime, sizeBytes:f.size, needsCompression: up.mime.startsWith("video/") && f.size > META_CAP, createdAt: Date.now() });
+    } catch(e){ failed.push(f.name + " (" + (e.code || e.message || "שגיאה") + ")"); }
+    sentBytes += f.size; done++; bar.style.width = (done/total*100) + "%";
+  }
+  uploading = false;
+  for (const link of links){
+    try { await db.collection("queue").add({ ...base, source:"drive", driveUrl:link, fileName:"Drive: " + link.slice(-24), createdAt: Date.now() }); }
+    catch(e){ failed.push(link); }
+    done++; bar.style.width = (done/total*100) + "%";
+  }
+  setTimeout(()=>{ prog.style.display="none"; }, 600);
+  if (failed.length){
+    $("#globalBanner").replaceChildren(h("div",{class:"banner err"}, "לא עלו: ", h("ul",null, failed.map(x=>h("li",{text:x})))));
+  }
+  const okN = total - failed.length;
+  S.files = S.files.filter(f => f.size > MAX_FILE); renderFiles();
+  $("#driveLinks").value = ""; $("#lNote").value = ""; $("#lWhen").value = ""; updateWhen();
+  if (okN) { pokeUploader("submit").then(ok => toast(ok ? `${okN} בתור. קלוד מעלה אותן למטא עכשיו` : `${okN} בתור. יעלו בבדיקה הקבועה (עד שעה)`)); }
+  else toast("שום דבר לא נכנס לתור");
+  validateLaunch();
+  if (okN) $('nav.tabs button[data-tab="queue"]').click();
+});
+
+/* ---------- queue ---------- */
+const ST = { pending:"ממתין להעלאה", processing:"בעבודה", done:"עלה למטא", error:"שגיאה" };
+$$("#qFilters button").forEach(b => b.addEventListener("click", () => {
+  S.qFilter = b.dataset.f; $$("#qFilters button").forEach(x => x.setAttribute("aria-pressed", x===b?"true":"false")); renderQueue();
+}));
+function renderQueue(){
+  const pending = S.queue.filter(q => q.status === "pending").length;
+  const proc = S.queue.filter(q => q.status === "processing").length;
+  const pc = $("#pendingCount"); pc.hidden = !pending; pc.textContent = pending;
+  $("#queueCtaText").textContent = (pending ? `${pending} ממתינות. הן עולות למטא אוטומטית תוך כמה דקות` + (proc ? `, ${proc} בעבודה כרגע.` : ".") : proc ? `${proc} בעבודה כרגע.` : "אין כרגע מודעות שממתינות.") + " בנוסף יש בדיקה קבועה כל שעה.";
+  $("#copyCmd").disabled = !pending;
+  renderUsage();
+  const list = $("#queueList"); list.textContent = "";
+  const items = S.queue.filter(q => S.qFilter === "all" || q.status === S.qFilter);
+  if (!items.length){ list.append(h("div",{class:"empty"}, S.loaded.queue ? "אין פריטים." : "טוען…")); return; }
+  for (const q of items){
+    const media = q.videoAssetId ? h("video",{src:"/_blob/"+q.videoAssetId+"#t=0.5",preload:"metadata",muted:true,playsinline:true,controls:true,poster: q.posterAssetId ? "/_blob/"+q.posterAssetId : null})
+      : q.posterAssetId ? h("img",{src:"/_blob/"+q.posterAssetId,alt:"",style:"width:72px;height:128px;object-fit:cover;border-radius:10px;flex:none"})
+      : h("div",{class:"ph"}, q.source === "drive" ? "Drive" : "וידאו");
+    const meta = h("div",{class:"q-meta"},
+      h("b",{text:q.productName||""}), " · ", q.angleName || "", h("br"),
+      q.conceptName ? "קונספט: " + q.conceptName : "", (q.adSetName && q.adSetName !== q.conceptName) ? " · אד-סט: " + q.adSetName : "",
+      " · ", q.mediaType === "image" ? "תמונה · " : "", q.launchStatus === "ACTIVE" ? "פעילה" : "כבויה", h("br"),
+      fmtTime(q.createdAt), q.sizeBytes ? " · " + fmtMB(q.sizeBytes) : "", (q.chunks||[]).length > 1 ? ` · ${q.chunks.length} חלקים` : "");
+    const body = h("div",{class:"q-body"},
+      h("div",{style:"display:flex;gap:8px;align-items:center;justify-content:space-between"},
+        h("div",{class:"q-title",text:q.adName || q.fileName || ""}),
+        h("span",{class:"pill " + (q.status||"neutral")}, ST[q.status] || q.status || "")),
+      meta);
+    if (q.scheduledAt) body.append(h("div",{class:"q-meta"},"⏰ מתחילה לרוץ ב-" + fmtTime(q.scheduledAt)));
+    if (q.note) body.append(h("div",{class:"q-meta"},"הערה: " + q.note));
+    if (q.adId) body.append(h("div",{class:"q-meta mono"},"Ad ID: " + q.adId));
+    if (q.error) body.append(h("div",{class:"q-err",text:q.error}));
+    const actions = h("div",{class:"q-actions"});
+    if (q.status === "error"){
+      actions.append(h("button",{class:"btn small",onclick:()=>db.collection("queue").doc(q.id).update({status:"pending",error:null}).then(()=>pokeUploader("retry")).then(ok=>toast(ok ? "חזר לתור. קלוד מעלה עכשיו" : "חזר לתור. יעלה בבדיקה הקבועה"))},"נסה שוב"));
+    }
+    if (q.status === "pending" || q.status === "error"){
+      const del = h("button",{class:"btn small danger"},"הסר");
+      armDelete(del, async () => {
+        try {
+          await db.collection("queue").doc(q.id).delete();
+          if (assets) {
+            const ids = (q.chunks || []).map(c => c.id).concat(q.videoAssetId ? [q.videoAssetId] : [], q.posterAssetId ? [q.posterAssetId] : []);
+            for (const id of [...new Set(ids)]) { try { await assets.delete(id); } catch(e){} }
+          }
+          toast("הוסר");
+        } catch(e){ toast("הסרה נכשלה"); }
+      });
+      actions.append(del);
+    }
+    if (q.adId && S.config?.adAccountId){
+      const acct = String(S.config.adAccountId).replace(/^act_/,"");
+      actions.append(h("a",{class:"btn small",href:`https://adsmanager.facebook.com/adsmanager/manage/ads?act=${encodeURIComponent(acct)}&selected_ad_ids=${encodeURIComponent(q.adId)}`,target:"_blank",rel:"noopener"},"פתח במנהל המודעות"));
+    }
+    if (actions.childNodes.length) body.append(actions);
+    list.append(h("div",{class:"card q-item"}, media, body));
+  }
+}
+const TRIGGER_ID = "trig_01Dn4LVK4qkKMELmZBuPNGcB";
+let mcpNs, lastPoke = 0;
+async function pokeUploader(reason){
+  try {
+    if (mcpNs === undefined) mcpNs = window.claude && window.claude.use ? await window.claude.use("mcp") : null;
+    if (!mcpNs) return false;
+    if (Date.now() - lastPoke < 20000) return true;
+    lastPoke = Date.now();
+    await mcpNs.callTool("Claude Code Remote", "fire_trigger", { trigger_id: TRIGGER_ID, text: "נשלחו פריטים חדשים לתור (" + reason + "). תעלה אותם עכשיו." });
+    return true;
+  } catch(e){ lastPoke = 0; return false; }
+}
+let usageT = 0;
+async function renderUsage(){
+  if (!assets || Date.now() - usageT < 15000) return; usageT = Date.now();
+  try { const u = (await assets.list()).usage; if (u && u.maxBytes) $("#usage").textContent = `אחסון: ${fmtMB(u.bytes)} מתוך ${fmtMB(u.maxBytes)} בשימוש`; } catch(e){}
+}
+$("#copyCmd").addEventListener("click", async () => {
+  const ok = await pokeUploader("manual");
+  toast(ok ? "קלוד התחיל להעלות. הסטטוס יתעדכן כאן" : "לא הצלחתי להעיר את קלוד. הבדיקה הקבועה תעלה תוך שעה");
+});
+
+/* ---------- setup completeness ---------- */
+function renderSetup(){
+  const box = $("#setupBanner"); box.textContent = "";
+  if (!S.loaded.config || !S.loaded.products || !S.loaded.angles) return;
+  const c = S.config || {}, miss = [];
+  if (!c.adAccountId) miss.push("Ad Account ID");
+  if (!c.pageId) miss.push("Facebook Page ID");
+  if (!(c.concepts||[]).length) miss.push("לפחות קונספט אחד");
+  if (!c.aiDisclosure) miss.push("בחירת גילוי AI");
+  if (!S.products.length) miss.push("לפחות מוצר אחד עם קישור");
+  if (!S.angles.length) miss.push("לפחות זווית אחת עם טקסט ראשי");
+  const empty = S.angles.filter(a => !(a.primaryTexts||[]).length).map(a => a.name);
+  if (empty.length) miss.push("טקסט ראשי לזוויות: " + empty.join(", "));
+  if (!miss.length) return;
+  box.append(h("div",{class:"banner warn"}, "כדי לשגר צריך להשלים בהגדרות:", h("ul",null, miss.map(m=>h("li",{text:m})))));
+}
+
+function renderAll(){ renderSetup(); renderLaunchSelects(); renderProducts(); renderQueue(); }
+
+/* ---------- boot ---------- */
+async function boot(){
+  const c = window.claude;
+  const timer = setTimeout(() => { if (!db) { $("#syncState").textContent = "לא מחובר"; $("#globalBanner").replaceChildren(h("div",{class:"banner err"},"לא הצלחתי להתחבר למאגר הנתונים. ודא שאתה מחובר ל-claude.ai ופתח את הדף מחדש.")); } }, 10000);
+  if (!c || !c.use){ clearTimeout(timer); $("#syncState").textContent = "תצוגה מקומית (ללא שמירה)"; renderAll(); fillSettings(); return; }
+  try { db = await c.use("db"); } catch(e){ db = null; }
+  try { assets = await c.use("assets"); } catch(e){ assets = null; }
+  try { userNs = await c.use("user"); myId = userNs ? await userNs.id() : null; } catch(e){}
+  clearTimeout(timer);
+  if (!db){ $("#syncState").textContent = "לא מחובר"; $("#globalBanner").replaceChildren(h("div",{class:"banner err"},"מאגר הנתונים לא זמין בתצוגה הזו. היכנס ל-claude.ai כדי להשתמש במשגר.")); renderAll(); fillSettings(); return; }
+  $("#syncState").textContent = "מסונכרן · טלפון + מחשב";
+  const onErr = name => e => { $("#globalBanner").replaceChildren(h("div",{class:"banner err"}, `שגיאה בטעינת ${name}: ${e.message || e.code}`)); };
+  let firstConfig = true;
+  db.doc("config/main").onSnapshot(snap => {
+    S.config = snap.exists ? snap.data() : null; S.loaded.config = true;
+    if (firstConfig || !document.activeElement || !$("#view-settings").contains(document.activeElement)) fillSettings();
+    firstConfig = false; renderAll();
+  }, onErr("הגדרות"));
+  db.collection("products").orderBy("createdAt","asc").onSnapshot(s => { S.products = s.docs.map(d => ({id:d.id, ...d.data()})); S.loaded.products = true; renderAll(); }, onErr("מוצרים"));
+  db.collection("angles").orderBy("createdAt","asc").onSnapshot(s => { S.angles = s.docs.map(d => ({id:d.id, ...d.data()})); S.loaded.angles = true; renderAll(); }, onErr("זוויות"));
+  db.collection("queue").orderBy("createdAt","desc").limit(300).onSnapshot(s => {
+    const before = new Map(S.queue.map(q => [q.id, q.status]));
+    S.queue = s.docs.map(d => ({id:d.id, ...d.data()})); S.loaded.queue = true;
+    const nowDone = S.queue.filter(q => q.status === "done" && before.has(q.id) && before.get(q.id) !== "done").length;
+    if (nowDone) toast(`${nowDone} מודעות עלו למטא`);
+    renderQueue(); validateLaunch();
+  }, onErr("תור"));
+}
+renderAdv();
+boot();
+})();
+</script>
