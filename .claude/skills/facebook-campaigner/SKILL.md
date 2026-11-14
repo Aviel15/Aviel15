@@ -26,7 +26,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 - **קמפיין טסטים ABO אחד לכל מוצר**: `TESTING | ABO | <שם המוצר>` (למשל `TESTING | ABO | Bamboo Boxer`, `TESTING | ABO | Bright Soap`). מטרה: מכירות, אופטימיזציה לרכישה (OFFSITE_CONVERSIONS).
 - **אד-סט לכל קונספט**: `Voice over` / `AI Animation` / `Static Images` / `Ugly Ads` (בחשבון קיימים גם שמות כמו VO, AI, Image statics, Ugly ads Video). כמה זוויות יכולות לשבת באותו אד-סט.
-- **מכשיר האדים**: קמפיין `TESTING | ABO | מכשיר אדים` = `120272609217950362`, אד-סט `Voice over` = `120272609217940362`, ו-`Static Images` (ה-ID ייאסף אחרי פרסום). בינתיים רק 2 הקונספטים האלה.
+- **מכשיר האדים**: קמפיין `TESTING | ABO | מכשיר אדים` = `120272609217950362` (**טיוטה**). אד-סט `Voice over` = `120272609217940362` (טיוטה, 60₪ ליום). אד-סט `Static Images`: עדיין לא נמצא בטיוטה; לחפש לפי שם ולשמור את ה-ID ב-`products/steam.conceptAdsets.IMG`. בינתיים רק 2 הקונספטים האלה.
 - **תקציבים**: אביאל מגדיר אותם בעצמו. לא לגעת בתקציב, לא ליצור קמפיין ולא ליצור אד-סט בלי בקשה מפורשת. אם האד-סט של הקונספט לא קיים, משאירים את הפריט בתור עם הערה ושואלים.
 - **אף פעם לא תמונה וסרטון באותו אד-סט.** Static Images = רק תמונות.
 
@@ -101,7 +101,11 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - primary_texts: 2 הטקסטים של הזווית. headlines: 2 הכותרות. בלי descriptions.
    - link_url: דף המוצר. CTA: ORDER_NOW. url_tags: ה-UTM. display_link: www.mayro-il.com.
    - כל האופטימיזציות כבויות, וגם multi-advertiser ו-personalized destinations.
-7. `ads_create_ad` עם `ad_name=adName`, PAUSED. אם `launchStatus=ACTIVE`, להפעיל עם `ads_activate_entity` (או בזמן `scheduledAt`).
+7. `ads_create_ad` עם `ad_name=adName`, `advantage_plus_creative_defaults=OFF`, ו-`creative={"creative_id":"..."}`. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
+   - **מצב טיוטה (ברירת המחדל של אביאל)**: הקמפיין נשאר טיוטה בכוונה. אם האד-סט קיים רק בטיוטה (`ads_get_ad_entities` עם `object_state=draft`), `ads_create_ad` מכניס את המודעה לטיוטה ומחזיר `status=DRAFT`. לבדוק `active_errors` ולתקן עם `ads_update_entity`.
+   - **לא לפרסם** (`ads_activate_entity` על הקמפיין) בלי בקשה מפורשת. אביאל מפרסם בעצמו. בפרסום כל המודעות עולות ACTIVE.
+   - אם האד-סט כבר פורסם, המודעה נוצרת חיה ו-PAUSED. מפעילים עם `ads_activate_entity` רק אם `launchStatus=ACTIVE`.
+   - לבדוק אם יש בטיוטה מודעות זבל שמטא יצרה אוטומטית ב-quick create (למשל "New Sales Ad": קרוסלת קטלוג, עמוד שגוי, SHOP_NOW). לא למחוק לבד. להתריע לאביאל.
 8. `update` ל-`done` עם `adId`, `creativeId`, `processedAt`. בשגיאה: `error` + `error` טקסט קצר בעברית.
 9. אחרי done: למחוק את חלקי הוידאו מהאחסון של הארטיפקט (`Artifact delete` + `path`) כדי לפנות מקום. את ה-poster להשאיר.
 10. לסכם לאביאל בשורה לכל מודעה: שם → אד-סט → Ad ID.
