@@ -144,15 +144,15 @@ details.how summary{cursor:pointer;font-weight:700}
 
     <div class="card">
       <h2>1. הסרטונים</h2>
-      <p class="hint">אפשר לבחור כמה סרטונים בבת אחת. כל סרטון = מודעה. עד 20MB לסרטון. סרטון כבד יותר מעלים דרך קישור Drive.</p>
+      <p class="hint">אפשר לבחור כמה סרטונים בבת אחת. כל סרטון = מודעה. עד 500MB לסרטון; קבצים גדולים עולים בחלקים אוטומטית. אל תסגור את הדף עד שההעלאה מסתיימת.</p>
       <label class="drop" id="drop">
-        <input type="file" id="fileInput" accept="video/mp4,video/quicktime,video/*" multiple hidden>
-        <strong>בחר סרטונים</strong>
+        <input type="file" id="fileInput" accept="video/mp4,video/quicktime,video/*,image/jpeg,image/png" multiple hidden>
+        <strong>בחר סרטונים או תמונות</strong>
         <span>או גרור לכאן (במחשב)</span>
       </label>
       <ul class="files" id="fileList"></ul>
       <details style="margin-top:12px">
-        <summary style="cursor:pointer;font-size:14px;font-weight:600">סרטון מעל 20MB? הדבק קישור Drive</summary>
+        <summary style="cursor:pointer;font-size:14px;font-weight:600">הסרטון כבר בדרייב? הדבק קישור במקום להעלות</summary>
         <label class="f" style="margin-top:8px"><span>קישורי Google Drive (קישור בכל שורה)</span>
           <textarea id="driveLinks" class="ltr" rows="3" placeholder="https://drive.google.com/file/d/..."></textarea>
           <small>הקובץ צריך להיות בדרייב שלך (אני ניגש אליו דרך החיבור לדרייב).</small>
@@ -166,13 +166,18 @@ details.how summary{cursor:pointer;font-weight:700}
       <label class="f"><span>זווית</span><select id="lAngle"></select>
         <small id="angleSummary"></small>
       </label>
-      <label class="f"><span>אד-סט</span><select id="lAdset"></select></label>
+      <label class="f"><span>קונספט (אד-סט)</span><select id="lConcept"></select>
+        <small id="adsetResolved"></small>
+      </label>
       <div id="newAdsetBox" hidden>
         <div class="row stack">
-          <label class="f"><span>שם לאד-סט החדש</span><input type="text" id="lNewAdsetName" placeholder="יתמלא אוטומטית"></label>
+          <label class="f"><span>שם לאד-סט החדש</span><input type="text" id="lNewAdsetName"></label>
           <label class="f"><span>תקציב יומי (₪)</span><input type="number" id="lNewAdsetBudget" inputmode="decimal" min="1"></label>
         </div>
       </div>
+      <details style="margin-bottom:12px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">להעלות לאד-סט אחר (חריג)</summary>
+        <label class="f" style="margin-top:8px"><select id="lAdset"></select></label>
+      </details>
       <div class="row stack">
         <label class="f"><span>סטטוס אחרי העלאה</span>
           <select id="lStatus"><option value="PAUSED">כבויה (אני מאשר ידנית)</option><option value="ACTIVE">פעילה מיד</option></select>
@@ -193,6 +198,7 @@ details.how summary{cursor:pointer;font-weight:700}
       <h2>להעלאה למטא</h2>
       <p class="hint" id="queueCtaText">אין כרגע מודעות שממתינות.</p>
       <button class="btn primary block" id="copyCmd">העתק פקודה לקלוד</button>
+      <p class="hint" id="usage" style="margin:10px 0 0;text-align:center"></p>
     </div>
     <div class="chips" id="qFilters">
       <button data-f="all" aria-pressed="true">הכל</button>
@@ -251,7 +257,10 @@ details.how summary{cursor:pointer;font-weight:700}
           <select id="sStatus"><option value="PAUSED">כבויה</option><option value="ACTIVE">פעילה</option></select>
         </label>
       </div>
-      <label class="f"><span>Display link (הדומיין שמוצג במודעה)</span><input type="text" id="sDisplay" class="ltr" placeholder="mayro-il.com"></label>
+      <div class="row stack">
+        <label class="f"><span>Display link (הדומיין שמוצג במודעה)</span><input type="text" id="sDisplay" class="ltr" placeholder="mayro-il.com"></label>
+        <label class="f"><span>Domain ID (דומיין מאומת)</span><input type="text" id="sDomainId" class="ltr"></label>
+      </div>
       <label class="f"><span>URL parameters (UTM)</span>
         <textarea id="sUtm" class="ltr" rows="2" placeholder="utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}"></textarea>
         <small>נכנס לשדה URL parameters של המודעה. אפשר להשתמש ב-{{ad.name}} וכו'.</small>
@@ -267,6 +276,12 @@ details.how summary{cursor:pointer;font-weight:700}
           <option value="OPT_IN">מסומן כנוצר ב-AI</option>
         </select>
       </label>
+    </div>
+
+    <div class="card">
+      <h2>קונספטים</h2>
+      <p class="hint">כל קונספט = אד-סט נפרד בקמפיין הטסטים של המוצר. שורה לכל קונספט: <span class="mono">קוד | שם | תקציב יומי</span></p>
+      <label class="f"><textarea id="sConcepts" rows="4" class="ltr" placeholder="VO | Voice over | 150"></textarea></label>
     </div>
 
     <div class="card">
@@ -308,7 +323,9 @@ details.how summary{cursor:pointer;font-weight:700}
     <label class="f"><span>שם המוצר</span><input type="text" name="name" required placeholder="בוקסר במבוק"></label>
     <label class="f"><span>קוד קצר לשם המודעה</span><input type="text" name="code" class="ltr" placeholder="BOXER"></label>
     <label class="f"><span>קישור לדף המוצר</span><input type="url" name="url" class="ltr" required placeholder="https://mayro-il.com/products/..."></label>
-    <label class="f"><span>אד-סט ברירת מחדל</span><select name="adsetId"></select></label>
+    <label class="f"><span>קמפיין הטסטים של המוצר (Campaign ID)</span><input type="text" name="campaignId" class="ltr" placeholder="ריק = קלוד יפתח TESTING | ABO | שם המוצר"></label>
+    <div id="conceptAdsetsBox"></div>
+    <label class="f"><span>אד-סט ברירת מחדל (לא חובה)</span><select name="adsetId"></select></label>
     <label class="f"><span>עמוד פייסבוק שממנו המודעה יוצאת</span><select name="pageId"></select></label>
     <label class="f"><span>UTM ייעודי (לא חובה, דורס את הכללי)</span><input type="text" name="urlTags" class="ltr"></label>
     <div class="dlg-actions">
@@ -348,7 +365,9 @@ details.how summary{cursor:pointer;font-weight:700}
 
 <script>
 (() => {
-const MAX_BYTES = 20 * 1024 * 1024;
+const MAX_FILE = 500 * 1024 * 1024;   // per video
+const CHUNK = 19 * 1024 * 1024;       // platform cap is 20 MiB per stored piece
+const META_CAP = 100 * 1024 * 1024;   // above this Claude compresses before sending to Meta
 const ADV = [
   ["text_optimizations","החלפה וערבוב של טקסטים"],
   ["enhance_cta","שיפור CTA (ביטויי מפתח)"],
@@ -410,6 +429,7 @@ function renderAdv(){
 
 /* ---------- settings form ---------- */
 const parseAdsets = txt => txt.split("\n").map(l => l.trim()).filter(Boolean).map(l => { const p = l.split("|"); return p.length>1 ? {name:p[0].trim(), id:p.slice(1).join("|").trim()} : {name:l, id:l}; }).filter(a => a.id);
+const parseConcepts = txt => txt.split("\n").map(l => l.split("|").map(x => x.trim())).filter(a => a[0]).map(a => ({key:a[0], name:a[1] || a[0], budget: Number(a[2]) || null}));
 function fillSettings(){
   const c = S.config || {};
   $("#sAccount").value = c.adAccountId || "";
@@ -424,6 +444,8 @@ function fillSettings(){
   $("#sAi").value = c.aiDisclosure || "";
   $("#sAdsets").value = (c.adSets || []).map(a => `${a.name} | ${a.id}`).join("\n");
   $("#sPages").value = (c.pages || []).map(a => `${a.name} | ${a.id}`).join("\n");
+  $("#sConcepts").value = (c.concepts || []).map(x => `${x.key} | ${x.name} | ${x.budget || ""}`).join("\n");
+  $("#sDomainId").value = c.domainId || "";
   $("#sTestCampaign").value = c.testCampaignId || "";
   $("#sBudget").value = c.defaultDailyBudget || "";
   $("#sTemplateAdset").value = c.templateAdSetId || "";
@@ -446,6 +468,8 @@ $("#saveSettings").addEventListener("click", async () => {
     aiDisclosure: $("#sAi").value,
     adSets: parseAdsets($("#sAdsets").value),
     pages: parseAdsets($("#sPages").value),
+    concepts: parseConcepts($("#sConcepts").value),
+    domainId: $("#sDomainId").value.trim(),
     testCampaignId: $("#sTestCampaign").value.trim(),
     defaultDailyBudget: Number($("#sBudget").value) || null,
     templateAdSetId: $("#sTemplateAdset").value.trim(),
@@ -497,6 +521,14 @@ function openProduct(p){
   $("#dlgProductTitle").textContent = p ? "עריכת מוצר" : "מוצר חדש";
   f.name.value = p?.name || ""; f.code.value = p?.code || ""; f.url.value = p?.url || ""; f.urlTags.value = p?.urlTags || "";
   adsetOptions(f.adsetId, p?.adsetId, false);
+  f.campaignId.value = p?.campaignId || "";
+  const cb = $("#conceptAdsetsBox"); cb.textContent = "";
+  const concepts = (S.config && S.config.concepts) || [];
+  if (concepts.length) cb.append(h("div",{style:"font-size:13px;font-weight:600;margin-bottom:4px"},"אד-סט לכל קונספט (ריק = ייפתח אוטומטית בהעלאה הראשונה)"));
+  for (const c of concepts){
+    const inp = h("input",{type:"text",class:"ltr","data-concept":c.key,placeholder:"Ad Set ID"}); inp.value = (p?.conceptAdsets || {})[c.key] || "";
+    cb.append(h("label",{class:"f"}, h("span",{text:c.name}), inp));
+  }
   f.pageId.textContent = ""; f.pageId.append(h("option",{value:""},"העמוד הראשי"));
   for (const pg of (S.config && S.config.pages) || []) f.pageId.append(h("option",{value:pg.id}, pg.name));
   f.pageId.value = p?.pageId || "";
@@ -507,7 +539,7 @@ $("#addProduct").addEventListener("click", () => openProduct(null));
 $("#dlgProduct").addEventListener("close", async () => {
   if ($("#dlgProduct").returnValue !== "save" || !db) return;
   const f = $("#formProduct");
-  const data = { name:f.name.value.trim(), code:f.code.value.trim(), url:f.url.value.trim(), adsetId:f.adsetId.value, pageId:f.pageId.value, urlTags:f.urlTags.value.trim(), updatedAt:Date.now() };
+  const data = { name:f.name.value.trim(), code:f.code.value.trim(), url:f.url.value.trim(), adsetId:f.adsetId.value, pageId:f.pageId.value, campaignId:f.campaignId.value.trim(), conceptAdsets: Object.fromEntries($$("[data-concept]").map(i => [i.dataset.concept, i.value.trim()]).filter(x => x[1])), urlTags:f.urlTags.value.trim(), updatedAt:Date.now() };
   try {
     if (editingProduct) await db.collection("products").doc(editingProduct.id).set(data);
     else await db.collection("products").add({...data, createdAt:Date.now()});
@@ -582,13 +614,17 @@ function renderLaunchSelects(){
   if (prevP && S.products.some(p=>p.id===prevP)) ps.value = prevP;
   else { try { const last = localStorage.getItem("al_lastProduct"); if (last && S.products.some(p=>p.id===last)) ps.value = last; } catch(e){} }
   renderAngleSelect();
+  const cs = $("#lConcept"), prevC = cs.value;
+  cs.textContent = "";
+  const concepts = (S.config && S.config.concepts) || [];
+  cs.append(h("option",{value:""}, concepts.length ? "בחר קונספט" : "אין קונספטים. הוסף בהגדרות"));
+  for (const c of concepts) cs.append(h("option",{value:c.key}, c.name));
+  if (prevC && concepts.some(c=>c.key===prevC)) cs.value = prevC;
   const as = $("#lAdset"), prevA = as.value;
-  adsetOptions(as, prevA, true);
-  if (!as.value){ const p = S.products.find(x=>x.id===ps.value); if (p?.adsetId) as.value = p.adsetId; }
-  $("#newAdsetBox").hidden = as.value !== "__new";
+  adsetOptions(as, prevA, false);
+  as.options[0].textContent = "לפי הקונספט (רגיל)";
   if (!$("#lStatus").dataset.touched) $("#lStatus").value = (S.config && S.config.defaultStatus) || "PAUSED";
-  if (!$("#lNewAdsetBudget").value && S.config?.defaultDailyBudget) $("#lNewAdsetBudget").value = S.config.defaultDailyBudget;
-  validateLaunch();
+  updateResolved();
 }
 function renderAngleSelect(){
   const pid = $("#lProduct").value, sel = $("#lAngle"), prev = sel.value;
@@ -607,12 +643,32 @@ function updateAngleSummary(){
 $("#lProduct").addEventListener("change", () => {
   try { localStorage.setItem("al_lastProduct", $("#lProduct").value); } catch(e){}
   renderAngleSelect();
-  const p = S.products.find(x=>x.id===$("#lProduct").value);
-  if (p?.adsetId) { $("#lAdset").value = p.adsetId; $("#newAdsetBox").hidden = true; }
-  validateLaunch();
+  updateResolved();
 });
+$("#lConcept").addEventListener("change", () => { $("#lNewAdsetName").value = ""; $("#lNewAdsetBudget").value = ""; updateResolved(); });
+function resolveTarget(){
+  const p = S.products.find(x=>x.id===$("#lProduct").value);
+  const c = ((S.config && S.config.concepts) || []).find(x => x.key === $("#lConcept").value);
+  const override = $("#lAdset").value;
+  if (override) return { adSetId: override, adSetName: ((S.config?.adSets)||[]).find(x=>x.id===override)?.name || override, concept: c, product: p };
+  if (!p || !c) return { concept: c, product: p };
+  const id = (p.conceptAdsets || {})[c.key];
+  if (id) return { adSetId: id, adSetName: c.name, concept: c, product: p };
+  return { newAdSet: true, concept: c, product: p };
+}
+function updateResolved(){
+  const t = resolveTarget(), el = $("#adsetResolved"), box = $("#newAdsetBox");
+  if (t.adSetId){ el.textContent = `ייכנס לאד-סט: ${t.adSetName} (${t.adSetId})`; box.hidden = true; }
+  else if (t.newAdSet){
+    el.textContent = `למוצר עוד אין אד-סט "${t.concept.name}". קלוד יפתח אותו ב${t.product.campaignId ? "קמפיין של המוצר" : "קמפיין טסטים חדש למוצר"} לפי ההגדרות שלמטה.`;
+    box.hidden = false;
+    if (!$("#lNewAdsetName").value) $("#lNewAdsetName").value = t.concept.name;
+    if (!$("#lNewAdsetBudget").value) $("#lNewAdsetBudget").value = t.concept.budget || S.config?.defaultDailyBudget || "";
+  } else { el.textContent = ""; box.hidden = true; }
+  validateLaunch();
+}
 $("#lAngle").addEventListener("change", () => { updateAngleSummary(); validateLaunch(); });
-$("#lAdset").addEventListener("change", () => { $("#newAdsetBox").hidden = $("#lAdset").value !== "__new"; validateLaunch(); });
+$("#lAdset").addEventListener("change", updateResolved);
 $("#lStatus").addEventListener("change", () => { $("#lStatus").dataset.touched = "1"; });
 $("#driveLinks").addEventListener("input", validateLaunch);
 
@@ -623,10 +679,12 @@ function setFiles(list){
 function renderFiles(){
   const ul = $("#fileList"); ul.textContent = "";
   S.files.forEach((f,i) => {
-    const bad = f.size > MAX_BYTES;
+    const bad = f.size > MAX_FILE;
+    const parts = Math.ceil(f.size / CHUNK);
+    const note = bad ? "מעל 500MB · דרך Drive" : fmtMB(f.size) + (parts > 1 ? ` · ${parts} חלקים` : "") + (f.size > META_CAP ? " · יידחס למטא" : "");
     ul.append(h("li",{class: bad ? "bad" : ""},
       h("span",{class:"nm",text:f.name}),
-      h("span",{class:"sz"}, bad ? "מעל 20MB · דרך Drive" : fmtMB(f.size)),
+      h("span",{class:"sz"}, note),
       h("button",{class:"btn small",type:"button","aria-label":"הסר",onclick:(e)=>{e.preventDefault();S.files.splice(i,1);renderFiles();validateLaunch();}},"✕")));
   });
 }
@@ -634,49 +692,130 @@ $("#fileInput").addEventListener("change", e => { setFiles([...e.target.files]);
 const drop = $("#drop");
 ["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e => setFiles([...e.dataTransfer.files].filter(f => f.type.startsWith("video/"))));
+drop.addEventListener("drop", e => setFiles([...e.dataTransfer.files].filter(f => f.type.startsWith("video/") || f.type.startsWith("image/"))));
 
+let uploading = false;
+window.addEventListener("beforeunload", e => { if (uploading) { e.preventDefault(); e.returnValue = ""; } });
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function withRetry(fn, tries = 3){
+  let last;
+  for (let i = 0; i < tries; i++){
+    try { return await fn(); } catch(e){ last = e; if (["invalid_request","too_large","unsupported_type","not_granted"].includes(e && e.code)) break; await sleep(1500 * (i+1)); }
+  }
+  throw last;
+}
+async function sha256Hex(buf){
+  try { const d = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join(""); } catch(e){ return null; }
+}
+function videoMime(f){
+  if (["video/mp4","video/quicktime","image/jpeg","image/png"].includes(f.type)) return f.type;
+  if (/\.png$/i.test(f.name)) return "image/png";
+  if (/\.jpe?g$/i.test(f.name)) return "image/jpeg";
+  return /\.mov$/i.test(f.name) ? "video/quicktime" : "video/mp4";
+}
+async function uploadChunked(file, onProgress){
+  const mime = videoMime(file), n = Math.max(1, Math.ceil(file.size / CHUNK)), chunks = [];
+  try {
+    for (let i = 0; i < n; i++){
+      const start = i * CHUNK, end = Math.min(file.size, start + CHUNK);
+      const buf = await file.slice(start, end).arrayBuffer();
+      const blob = new Blob([buf], {type: mime});
+      onProgress && onProgress(i+1, n, start);
+      const r = await withRetry(() => assets.upload(blob, {type: mime}));
+      if (r.sizeBytes !== end - start) throw {code:"size_mismatch", message:"חלק נשמר בגודל שגוי"};
+      chunks.push({ id: r.id, size: end - start, sha256: await sha256Hex(buf) });
+      onProgress && onProgress(i+1, n, end);
+    }
+  } catch(e){
+    for (const c of chunks){ try { await assets.delete(c.id); } catch(_){} }
+    throw e;
+  }
+  return { chunks, mime };
+}
+function capturePoster(file){
+  return new Promise(resolve => {
+    let url; const v = document.createElement("video");
+    const done = b => { try { URL.revokeObjectURL(url); } catch(e){} resolve(b); };
+    const t = setTimeout(() => done(null), 8000);
+    v.muted = true; v.playsInline = true; v.preload = "auto";
+    v.onloadeddata = () => { try { v.currentTime = Math.min(1, (v.duration || 2) / 3); } catch(e){ clearTimeout(t); done(null); } };
+    v.onseeked = () => {
+      try {
+        const w = v.videoWidth, hh = v.videoHeight; if (!w || !hh) { clearTimeout(t); return done(null); }
+        const scale = Math.min(1, 1080 / Math.max(w, hh));
+        const c = document.createElement("canvas"); c.width = Math.round(w*scale); c.height = Math.round(hh*scale);
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(b => { clearTimeout(t); done(b); }, "image/jpeg", 0.85);
+      } catch(e){ clearTimeout(t); done(null); }
+    };
+    v.onerror = () => { clearTimeout(t); done(null); };
+    url = URL.createObjectURL(file); v.src = url;
+  });
+}
 const driveList = () => $("#driveLinks").value.split("\n").map(s=>s.trim()).filter(s => /^https?:\/\//.test(s));
 function validateLaunch(){
-  const okFiles = S.files.filter(f => f.size <= MAX_BYTES).length + driveList().length;
-  const adset = $("#lAdset").value;
+  const okFiles = S.files.filter(f => f.size <= MAX_FILE).length + driveList().length;
+  const t = resolveTarget();
+  const adset = !!(t.adSetId || (t.newAdSet && Number($("#lNewAdsetBudget").value) > 0));
   const ok = !!db && !!assets && okFiles > 0 && $("#lProduct").value && $("#lAngle").value && adset;
   $("#submitBtn").disabled = !ok;
   $("#submitBtn").textContent = okFiles ? `שלח ${okFiles} ${okFiles===1?"מודעה":"מודעות"} לתור` : "שלח לתור";
+  const ang = S.angles.find(x => x.id === $("#lAngle").value);
+  const noCopy = ang && !(ang.primaryTexts || []).length;
+  if (noCopy) $("#submitBtn").disabled = true;
   let hint = "";
   if (db && !assets) hint = "אין הרשאת העלאת קבצים בתצוגה הזו (רק לעורכים).";
-  else if (!okFiles) hint = "בחר לפחות סרטון אחד.";
+  else if (!okFiles) hint = "בחר לפחות סרטון או תמונה אחת.";
   else if (!$("#lProduct").value) hint = "בחר מוצר.";
   else if (!$("#lAngle").value) hint = "בחר זווית.";
-  else if (!adset) hint = "בחר אד-סט.";
+  else if (noCopy) hint = "לזווית הזו עוד אין טקסט ראשי. הוסף בהגדרות.";
+  else if (!$("#lConcept").value && !$("#lAdset").value) hint = "בחר קונספט.";
+  else if (!adset) hint = "חסר תקציב יומי לאד-סט החדש.";
   $("#submitHint").textContent = hint;
 }
 
 $("#submitBtn").addEventListener("click", async () => {
   const btn = $("#submitBtn"); btn.disabled = true;
   const prog = $("#upProg"), bar = prog.querySelector("i"); prog.style.display = "block"; bar.style.width = "0";
-  const files = S.files.filter(f => f.size <= MAX_BYTES), links = driveList();
+  const files = S.files.filter(f => f.size <= MAX_FILE), links = driveList();
+  const totalBytes = files.reduce((n,f)=>n+f.size,0);
+  try {
+    const u = (await assets.list()).usage;
+    if (u && u.maxBytes && u.bytes + totalBytes > u.maxBytes){
+      $("#globalBanner").replaceChildren(h("div",{class:"banner err"}, `אין מספיק מקום באחסון של המשגר (${fmtMB(u.maxBytes - u.bytes)} פנויים, צריך ${fmtMB(totalBytes)}). הסר פריטים מהתור או בקש מקלוד לנקות סרטונים שכבר עלו.`));
+      prog.style.display = "none"; validateLaunch(); return;
+    }
+  } catch(e){}
+  uploading = true;
   const total = files.length + links.length;
   const p = S.products.find(x=>x.id===$("#lProduct").value), a = S.angles.find(x=>x.id===$("#lAngle").value);
-  const adsetVal = $("#lAdset").value;
-  const adsetName = ((S.config?.adSets)||[]).find(x=>x.id===adsetVal)?.name || "";
+  const tg = resolveTarget();
   const batchId = "b" + Date.now().toString(36);
   const base = {
     batchId, productId:p.id, productName:p.name, angleId:a.id, angleName:a.name,
-    adSetId: adsetVal === "__new" ? "" : adsetVal, adSetName: adsetVal === "__new" ? "" : adsetName,
-    newAdSet: adsetVal === "__new" ? { name: $("#lNewAdsetName").value.trim(), dailyBudget: Number($("#lNewAdsetBudget").value) || null } : null,
+    conceptKey: tg.concept?.key || "", conceptName: tg.concept?.name || "",
+    adSetId: tg.adSetId || "", adSetName: tg.adSetName || "",
+    newAdSet: tg.newAdSet ? { name: $("#lNewAdsetName").value.trim() || tg.concept.name, dailyBudget: Number($("#lNewAdsetBudget").value) || null, campaignId: p.campaignId || "" } : null,
     launchStatus: $("#lStatus").value, tag: $("#lTag").value.trim(), note: $("#lNote").value.trim(),
     status:"pending", createdAt: Date.now(), createdBy: myId || null
   };
-  let done = 0, failed = [];
+  let done = 0, failed = [], sentBytes = 0;
   for (const f of files){
-    $("#submitHint").textContent = `מעלה ${done+1}/${total}: ${f.name}`;
+    const label = `מעלה ${done+1}/${total}: ${f.name}`;
+    $("#submitHint").textContent = label;
     try {
-      const r = await assets.upload(f);
-      await db.collection("queue").add({ ...base, source:"asset", videoAssetId:r.id, videoUrl:r.url, fileName:f.name, sizeBytes:r.sizeBytes, createdAt: Date.now() });
+      const up = await uploadChunked(f, (pi, pn, bytes) => {
+        $("#submitHint").textContent = pn > 1 ? `${label} · חלק ${pi}/${pn}` : label;
+        bar.style.width = (((sentBytes + bytes) / Math.max(totalBytes,1)) * 100 * (files.length/total)) + "%";
+      });
+      let posterAssetId = null;
+      if (f.type.startsWith("video/") || /\.(mp4|mov)$/i.test(f.name)) try { const poster = await capturePoster(f); if (poster) posterAssetId = (await withRetry(() => assets.upload(poster, {type:"image/jpeg"}))).id; } catch(e){}
+      await db.collection("queue").add({ ...base, source:"asset", chunks: up.chunks, videoAssetId: up.chunks.length === 1 && up.mime.startsWith("video/") ? up.chunks[0].id : null,
+        posterAssetId: posterAssetId || (up.mime.startsWith("image/") && up.chunks.length === 1 ? up.chunks[0].id : null), mediaType: up.mime.startsWith("image/") ? "image" : "video", fileName:f.name, mimeType: up.mime, sizeBytes:f.size, needsCompression: up.mime.startsWith("video/") && f.size > META_CAP, createdAt: Date.now() });
     } catch(e){ failed.push(f.name + " (" + (e.code || e.message || "שגיאה") + ")"); }
-    done++; bar.style.width = (done/total*100) + "%";
+    sentBytes += f.size; done++; bar.style.width = (done/total*100) + "%";
   }
+  uploading = false;
   for (const link of links){
     try { await db.collection("queue").add({ ...base, source:"drive", driveUrl:link, fileName:"Drive: " + link.slice(-24), createdAt: Date.now() }); }
     catch(e){ failed.push(link); }
@@ -687,7 +826,7 @@ $("#submitBtn").addEventListener("click", async () => {
     $("#globalBanner").replaceChildren(h("div",{class:"banner err"}, "לא עלו: ", h("ul",null, failed.map(x=>h("li",{text:x})))));
   }
   const okN = total - failed.length;
-  S.files = S.files.filter(f => f.size > MAX_BYTES); renderFiles();
+  S.files = S.files.filter(f => f.size > MAX_FILE); renderFiles();
   $("#driveLinks").value = ""; $("#lTag").value = ""; $("#lNote").value = "";
   toast(okN ? `${okN} נכנסו לתור` : "שום דבר לא נכנס לתור");
   validateLaunch();
@@ -705,16 +844,19 @@ function renderQueue(){
   const pc = $("#pendingCount"); pc.hidden = !pending; pc.textContent = pending;
   $("#queueCtaText").textContent = pending ? `${pending} מודעות ממתינות. העתק את הפקודה והדבק בצ'אט עם קלוד.` + (proc ? ` (${proc} בעבודה כרגע)` : "") : proc ? `${proc} בעבודה כרגע.` : "אין כרגע מודעות שממתינות.";
   $("#copyCmd").disabled = !pending;
+  renderUsage();
   const list = $("#queueList"); list.textContent = "";
   const items = S.queue.filter(q => S.qFilter === "all" || q.status === S.qFilter);
   if (!items.length){ list.append(h("div",{class:"empty"}, S.loaded.queue ? "אין פריטים." : "טוען…")); return; }
   for (const q of items){
-    const media = q.videoAssetId ? h("video",{src:"/_blob/"+q.videoAssetId+"#t=0.5",preload:"metadata",muted:true,playsinline:true,controls:true}) : h("div",{class:"ph"},"Drive");
+    const media = q.videoAssetId ? h("video",{src:"/_blob/"+q.videoAssetId+"#t=0.5",preload:"metadata",muted:true,playsinline:true,controls:true,poster: q.posterAssetId ? "/_blob/"+q.posterAssetId : null})
+      : q.posterAssetId ? h("img",{src:"/_blob/"+q.posterAssetId,alt:"",style:"width:72px;height:128px;object-fit:cover;border-radius:10px;flex:none"})
+      : h("div",{class:"ph"}, q.source === "drive" ? "Drive" : "וידאו");
     const meta = h("div",{class:"q-meta"},
       h("b",{text:q.productName||""}), " · ", q.angleName || "", h("br"),
-      q.adSetName ? "אד-סט: " + q.adSetName : q.newAdSet ? `אד-סט חדש${q.newAdSet.dailyBudget ? " · ₪"+q.newAdSet.dailyBudget+"/יום" : ""}` : "אד-סט: " + (q.adSetId||""),
-      " · ", q.launchStatus === "ACTIVE" ? "פעילה" : "כבויה", h("br"),
-      fmtTime(q.createdAt), q.sizeBytes ? " · " + fmtMB(q.sizeBytes) : "");
+      q.conceptName ? "קונספט: " + q.conceptName : "", q.newAdSet ? ` · אד-סט חדש${q.newAdSet.dailyBudget ? " ₪"+q.newAdSet.dailyBudget+"/יום" : ""}` : (q.adSetName && q.adSetName !== q.conceptName) ? " · אד-סט: " + q.adSetName : "",
+      " · ", q.mediaType === "image" ? "תמונה · " : "", q.launchStatus === "ACTIVE" ? "פעילה" : "כבויה", h("br"),
+      fmtTime(q.createdAt), q.sizeBytes ? " · " + fmtMB(q.sizeBytes) : "", (q.chunks||[]).length > 1 ? ` · ${q.chunks.length} חלקים` : "");
     const body = h("div",{class:"q-body"},
       h("div",{style:"display:flex;gap:8px;align-items:center;justify-content:space-between"},
         h("div",{class:"q-title",text:q.adName || q.fileName || ""}),
@@ -732,7 +874,10 @@ function renderQueue(){
       armDelete(del, async () => {
         try {
           await db.collection("queue").doc(q.id).delete();
-          if (q.videoAssetId && assets) { try { await assets.delete(q.videoAssetId); } catch(e){} }
+          if (assets) {
+            const ids = (q.chunks || []).map(c => c.id).concat(q.videoAssetId ? [q.videoAssetId] : [], q.posterAssetId ? [q.posterAssetId] : []);
+            for (const id of [...new Set(ids)]) { try { await assets.delete(id); } catch(e){} }
+          }
           toast("הוסר");
         } catch(e){ toast("הסרה נכשלה"); }
       });
@@ -745,6 +890,11 @@ function renderQueue(){
     if (actions.childNodes.length) body.append(actions);
     list.append(h("div",{class:"card q-item"}, media, body));
   }
+}
+let usageT = 0;
+async function renderUsage(){
+  if (!assets || Date.now() - usageT < 15000) return; usageT = Date.now();
+  try { const u = (await assets.list()).usage; if (u && u.maxBytes) $("#usage").textContent = `אחסון: ${fmtMB(u.bytes)} מתוך ${fmtMB(u.maxBytes)} בשימוש`; } catch(e){}
 }
 $("#copyCmd").addEventListener("click", async () => {
   const txt = "תעלה את התור ממשגר המודעות";
@@ -759,11 +909,12 @@ function renderSetup(){
   const c = S.config || {}, miss = [];
   if (!c.adAccountId) miss.push("Ad Account ID");
   if (!c.pageId) miss.push("Facebook Page ID");
-  if (!c.igUserId) miss.push("Instagram Account ID");
-  if (!(c.adSets||[]).length) miss.push("לפחות אד-סט אחד");
+  if (!(c.concepts||[]).length) miss.push("לפחות קונספט אחד");
   if (!c.aiDisclosure) miss.push("בחירת גילוי AI");
   if (!S.products.length) miss.push("לפחות מוצר אחד עם קישור");
   if (!S.angles.length) miss.push("לפחות זווית אחת עם טקסט ראשי");
+  const empty = S.angles.filter(a => !(a.primaryTexts||[]).length).map(a => a.name);
+  if (empty.length) miss.push("טקסט ראשי לזוויות: " + empty.join(", "));
   if (!miss.length) return;
   box.append(h("div",{class:"banner warn"}, "כדי לשגר צריך להשלים בהגדרות:", h("ul",null, miss.map(m=>h("li",{text:m})))));
 }
