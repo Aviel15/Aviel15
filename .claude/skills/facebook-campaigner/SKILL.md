@@ -81,7 +81,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 - Essential enhancements **0/3**: Relevant comments, Enhance CTA, Add video effects כבויים.
 - Related media **0/10**: כבוי לגמרי.
 
-ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
+ביישום: ה-`degrees_of_freedom_spec` עם OPT_OUT לכל feature נכנס בתוך ה-creative ה-inline (סעיף 5, שלב 6). אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
 
 **degrees_of_freedom_spec שעבר אימות** (המאפיין `music` נדחה, לא לשלוח אותו):
 `{"creative_features_spec":{"text_optimizations","enhance_cta","inline_comment","image_brightness_and_contrast","video_auto_crop","adapt_to_placement","add_text_overlay","description_automation","site_extensions","product_extensions","text_translation","reveal_details_over_time","show_summary","image_touchups","image_animation","translate_voiceover","ig_video_native_subtitle"}}`. כל אחד מהם עם `{"enroll_status":"OPT_OUT"}`.
