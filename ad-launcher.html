@@ -162,19 +162,14 @@ details.how summary{cursor:pointer;font-weight:700}
 
     <div class="card">
       <h2>2. לאן זה עולה</h2>
-      <label class="f"><span>מוצר</span><select id="lProduct"></select></label>
-      <label class="f"><span>זווית</span><select id="lAngle"></select>
-        <small id="angleSummary"></small>
-      </label>
+      <label class="f" id="lProductWrap"><span>מוצר</span><select id="lProduct"></select></label>
       <label class="f"><span>קונספט (אד-סט)</span><select id="lConcept"></select>
         <small id="adsetResolved"></small>
       </label>
-      <div id="newAdsetBox" hidden>
-        <div class="row stack">
-          <label class="f"><span>שם לאד-סט החדש</span><input type="text" id="lNewAdsetName"></label>
-          <label class="f"><span>תקציב יומי (₪)</span><input type="number" id="lNewAdsetBudget" inputmode="decimal" min="1"></label>
-        </div>
-      </div>
+      <label class="f"><span>זווית</span><select id="lAngle"></select>
+        <small id="angleSummary"></small>
+      </label>
+      <div id="mixWarn"></div>
       <details style="margin-bottom:12px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">להעלות לאד-סט אחר (חריג)</summary>
         <label class="f" style="margin-top:8px"><select id="lAdset"></select></label>
       </details>
@@ -182,7 +177,10 @@ details.how summary{cursor:pointer;font-weight:700}
         <label class="f"><span>סטטוס אחרי העלאה</span>
           <select id="lStatus"><option value="PAUSED">כבויה (אני מאשר ידנית)</option><option value="ACTIVE">פעילה מיד</option></select>
         </label>
-        <label class="f"><span>תגית לשם המודעה (לא חובה)</span><input type="text" id="lTag" placeholder="למשל hook3 / UGC-dana"></label>
+        <label class="f"><span>מתי להעלות</span>
+          <input type="datetime-local" id="lWhen">
+          <small id="whenHint">ריק = בהרצה הבאה</small>
+        </label>
       </div>
       <label class="f"><span>הערה לי (לא חובה)</span><input type="text" id="lNote" placeholder="למשל: להחליף טקסט ראשי לגרסה 2"></label>
     </div>
@@ -266,8 +264,8 @@ details.how summary{cursor:pointer;font-weight:700}
         <small>נכנס לשדה URL parameters של המודעה. אפשר להשתמש ב-{{ad.name}} וכו'.</small>
       </label>
       <label class="f"><span>תבנית שם מודעה</span>
-        <input type="text" id="sNaming" class="ltr" placeholder="{product}_{angle}_{tag}_{date}_{n}">
-        <small>משתנים: {product} {angle} {tag} {file} {date} {n}</small>
+        <input type="text" id="sNaming" class="ltr" placeholder="{file}">
+        <small>{file} = שם הקובץ בלי סיומת. אם השם לא נגמר ב-_מספר, מתווסף _1, _2… לפי הסדר. משתנים נוספים: {product} {angle} {concept} {date} {n}</small>
       </label>
       <label class="f"><span>גילוי תוכן AI (חובת שקיפות של מטא)</span>
         <select id="sAi">
@@ -280,8 +278,8 @@ details.how summary{cursor:pointer;font-weight:700}
 
     <div class="card">
       <h2>קונספטים</h2>
-      <p class="hint">כל קונספט = אד-סט נפרד בקמפיין הטסטים של המוצר. שורה לכל קונספט: <span class="mono">קוד | שם | תקציב יומי</span></p>
-      <label class="f"><textarea id="sConcepts" rows="4" class="ltr" placeholder="VO | Voice over | 150"></textarea></label>
+      <p class="hint">כל קונספט = אד-סט נפרד בקמפיין הטסטים של המוצר. שורה לכל קונספט: <span class="mono">קוד | שם האד-סט</span>. את הקמפיין, האד-סטים והתקציבים אתה פותח בעצמך; קלוד רק מכניס מודעות.</p>
+      <label class="f"><textarea id="sConcepts" rows="4" class="ltr" placeholder="VO | Voice over"></textarea></label>
     </div>
 
     <div class="card">
@@ -299,7 +297,7 @@ details.how summary{cursor:pointer;font-weight:700}
 
     <div class="card">
       <h2>אופטימיזציות Advantage+ קריאייטיב</h2>
-      <p class="hint">ירוק = מטא מורשית להפעיל. כבוי = יישלח כ-OPT_OUT. ברירת מחדל: הכל כבוי.</p>
+      <p class="hint">לפי ההגדרה שלך הכל כבוי (0/3, 0/5, 0/3, 0/10, בלי מוצרים). ירוק = מטא מורשית להפעיל.</p>
       <div id="advList"></div>
     </div>
 
@@ -369,19 +367,11 @@ const MAX_FILE = 500 * 1024 * 1024;   // per video
 const CHUNK = 19 * 1024 * 1024;       // platform cap is 20 MiB per stored piece
 const META_CAP = 100 * 1024 * 1024;   // above this Claude compresses before sending to Meta
 const ADV = [
-  ["text_optimizations","החלפה וערבוב של טקסטים"],
-  ["enhance_cta","שיפור CTA (ביטויי מפתח)"],
-  ["inline_comment","הצגת תגובה בולטת"],
-  ["video_auto_crop","חיתוך וידאו אוטומטי"],
-  ["adapt_to_placement","התאמה למיקום / יחס תצוגה"],
-  ["music","הוספת מוזיקה"],
-  ["add_text_overlay","הוספת שכבות טקסט"],
-  ["description_automation","תיאורים אוטומטיים"],
-  ["site_extensions","קישורי אתר נוספים"],
-  ["product_extensions","הצגת מוצרים מהקטלוג"],
-  ["text_translation","תרגום טקסט"],
-  ["reveal_details_over_time","חשיפת פרטים בהדרגה"],
-  ["image_brightness_and_contrast","בהירות וניגודיות"],
+  ["creative_setup","Creative setup: Site links, Summaries, Website highlights"],
+  ["show_products","Show products (מוצרים מהקטלוג)"],
+  ["advantage_plus_creative","Advantage+ creative enhancements (כל ה-5: Sticker CTA, Video touch-ups, Text improvements ועוד)"],
+  ["essential_enhancements","Essential enhancements (Relevant comments, Enhance CTA, Add video effects)"],
+  ["related_media","Related media (0/10)"],
 ];
 
 const $ = s => document.querySelector(s);
@@ -421,7 +411,7 @@ function renderAdv(){
   const on = (S.config && S.config.advantageOn) || {};
   for (const [k,label] of ADV){
     box.append(h("div",{class:"toggle"},
-      h("div",{class:"tl"}, label, h("small",{text:k})),
+      h("div",{class:"tl"}, label),
       h("label",{class:"sw"}, h("input",{type:"checkbox","data-adv":k, checked: !!on[k]}), h("i"))
     ));
   }
@@ -444,7 +434,7 @@ function fillSettings(){
   $("#sAi").value = c.aiDisclosure || "";
   $("#sAdsets").value = (c.adSets || []).map(a => `${a.name} | ${a.id}`).join("\n");
   $("#sPages").value = (c.pages || []).map(a => `${a.name} | ${a.id}`).join("\n");
-  $("#sConcepts").value = (c.concepts || []).map(x => `${x.key} | ${x.name} | ${x.budget || ""}`).join("\n");
+  $("#sConcepts").value = (c.concepts || []).map(x => `${x.key} | ${x.name}`).join("\n");
   $("#sDomainId").value = c.domainId || "";
   $("#sTestCampaign").value = c.testCampaignId || "";
   $("#sBudget").value = c.defaultDailyBudget || "";
@@ -464,7 +454,7 @@ $("#saveSettings").addEventListener("click", async () => {
     defaultStatus: $("#sStatus").value,
     displayLink: $("#sDisplay").value.trim(),
     urlTags: $("#sUtm").value.trim(),
-    naming: $("#sNaming").value.trim() || "{product}_{angle}_{tag}_{date}_{n}",
+    naming: $("#sNaming").value.trim() || "{file}",
     aiDisclosure: $("#sAi").value,
     adSets: parseAdsets($("#sAdsets").value),
     pages: parseAdsets($("#sPages").value),
@@ -613,6 +603,8 @@ function renderLaunchSelects(){
   for (const p of S.products) ps.append(h("option",{value:p.id}, p.name));
   if (prevP && S.products.some(p=>p.id===prevP)) ps.value = prevP;
   else { try { const last = localStorage.getItem("al_lastProduct"); if (last && S.products.some(p=>p.id===last)) ps.value = last; } catch(e){} }
+  if (S.products.length === 1) ps.value = S.products[0].id;
+  $("#lProductWrap").hidden = S.products.length === 1;
   renderAngleSelect();
   const cs = $("#lConcept"), prevC = cs.value;
   cs.textContent = "";
@@ -645,7 +637,7 @@ $("#lProduct").addEventListener("change", () => {
   renderAngleSelect();
   updateResolved();
 });
-$("#lConcept").addEventListener("change", () => { $("#lNewAdsetName").value = ""; $("#lNewAdsetBudget").value = ""; updateResolved(); });
+$("#lConcept").addEventListener("change", () => { updateResolved(); renderFiles(); });
 function resolveTarget(){
   const p = S.products.find(x=>x.id===$("#lProduct").value);
   const c = ((S.config && S.config.concepts) || []).find(x => x.key === $("#lConcept").value);
@@ -657,14 +649,10 @@ function resolveTarget(){
   return { newAdSet: true, concept: c, product: p };
 }
 function updateResolved(){
-  const t = resolveTarget(), el = $("#adsetResolved"), box = $("#newAdsetBox");
-  if (t.adSetId){ el.textContent = `ייכנס לאד-סט: ${t.adSetName} (${t.adSetId})`; box.hidden = true; }
-  else if (t.newAdSet){
-    el.textContent = `למוצר עוד אין אד-סט "${t.concept.name}". קלוד יפתח אותו ב${t.product.campaignId ? "קמפיין של המוצר" : "קמפיין טסטים חדש למוצר"} לפי ההגדרות שלמטה.`;
-    box.hidden = false;
-    if (!$("#lNewAdsetName").value) $("#lNewAdsetName").value = t.concept.name;
-    if (!$("#lNewAdsetBudget").value) $("#lNewAdsetBudget").value = t.concept.budget || S.config?.defaultDailyBudget || "";
-  } else { el.textContent = ""; box.hidden = true; }
+  const t = resolveTarget(), el = $("#adsetResolved");
+  if (t.adSetId) el.textContent = `ייכנס לאד-סט: ${t.adSetName} (${t.adSetId})`;
+  else if (t.newAdSet) el.textContent = `קלוד יכניס לאד-סט "${t.concept.name}" בקמפיין הטסטים של ${t.product.name}. אם הוא עוד לא קיים, המודעות ימתינו עד שתפתח אותו.`;
+  else el.textContent = "";
   validateLaunch();
 }
 $("#lAngle").addEventListener("change", () => { updateAngleSummary(); validateLaunch(); });
@@ -678,12 +666,13 @@ function setFiles(list){
 }
 function renderFiles(){
   const ul = $("#fileList"); ul.textContent = "";
+  const names = adNames(S.files.filter(f => f.size <= MAX_FILE));
   S.files.forEach((f,i) => {
     const bad = f.size > MAX_FILE;
     const parts = Math.ceil(f.size / CHUNK);
     const note = bad ? "מעל 500MB · דרך Drive" : fmtMB(f.size) + (parts > 1 ? ` · ${parts} חלקים` : "") + (f.size > META_CAP ? " · יידחס למטא" : "");
     ul.append(h("li",{class: bad ? "bad" : ""},
-      h("span",{class:"nm",text:f.name}),
+      h("span",{class:"nm"}, h("div",{text: names.get(f) || f.name}), names.get(f) ? h("div",{style:"font-size:11px;color:var(--muted)",text:f.name}) : null),
       h("span",{class:"sz"}, note),
       h("button",{class:"btn small",type:"button","aria-label":"הסר",onclick:(e)=>{e.preventDefault();S.files.splice(i,1);renderFiles();validateLaunch();}},"✕")));
   });
@@ -752,11 +741,43 @@ function capturePoster(file){
     url = URL.createObjectURL(file); v.src = url;
   });
 }
+function whenMs(){ const v = $("#lWhen").value; if (!v) return null; const t = new Date(v).getTime(); return isNaN(t) ? null : t; }
+function updateWhen(){
+  const t = whenMs();
+  $("#whenHint").textContent = !t ? "ריק = בהרצה הבאה" : t < Date.now() ? "השעה כבר עברה, יעלה בהרצה הבאה" : "יעלה ב-" + fmtTime(t);
+}
+$("#lWhen").addEventListener("input", updateWhen);
+const isImageFile = f => (f.type || "").startsWith("image/") || /\.(jpe?g|png)$/i.test(f.name);
+function adNames(files){
+  const pat = (S.config && S.config.naming) || "{file}";
+  const p = S.products.find(x=>x.id===$("#lProduct").value), a = S.angles.find(x=>x.id===$("#lAngle").value);
+  const c = ((S.config && S.config.concepts) || []).find(x => x.key === $("#lConcept").value);
+  const d = new Date(), date = String(d.getDate()).padStart(2,"0") + String(d.getMonth()+1).padStart(2,"0");
+  let n = 0; const out = new Map();
+  for (const f of files){
+    let base = f.name.replace(/\.[^.]+$/, "").trim();
+    n++;
+    let name = pat.replace(/\{file\}/g, base).replace(/\{product\}/g, p?.code || p?.name || "").replace(/\{angle\}/g, a?.code || a?.name || "")
+      .replace(/\{concept\}/g, c?.key || "").replace(/\{date\}/g, date).replace(/\{n\}/g, String(n));
+    if (!/_\d+$/.test(name)) name = name + "_" + n;
+    out.set(f, name);
+  }
+  return out;
+}
+function renderMixWarn(){
+  const box = $("#mixWarn"); box.textContent = "";
+  const c = $("#lConcept").value; if (!c) return;
+  const imgs = S.files.filter(isImageFile).length, vids = S.files.length - imgs;
+  const staticConcept = /IMG|STATIC/i.test(c);
+  if (staticConcept && vids) box.append(h("div",{class:"banner warn"},"בחרת קונספט של תמונות אבל יש סרטונים ברשימה. לפי השיטה, תמונה וסרטון לא נכנסים לאותו אד-סט."));
+  else if (!staticConcept && imgs) box.append(h("div",{class:"banner warn"},"יש תמונות ברשימה אבל הקונספט הוא של סרטונים. לפי השיטה, תמונה וסרטון לא נכנסים לאותו אד-סט."));
+}
 const driveList = () => $("#driveLinks").value.split("\n").map(s=>s.trim()).filter(s => /^https?:\/\//.test(s));
 function validateLaunch(){
+  renderMixWarn();
   const okFiles = S.files.filter(f => f.size <= MAX_FILE).length + driveList().length;
   const t = resolveTarget();
-  const adset = !!(t.adSetId || (t.newAdSet && Number($("#lNewAdsetBudget").value) > 0));
+  const adset = !!(t.adSetId || t.newAdSet);
   const ok = !!db && !!assets && okFiles > 0 && $("#lProduct").value && $("#lAngle").value && adset;
   $("#submitBtn").disabled = !ok;
   $("#submitBtn").textContent = okFiles ? `שלח ${okFiles} ${okFiles===1?"מודעה":"מודעות"} לתור` : "שלח לתור";
@@ -770,7 +791,7 @@ function validateLaunch(){
   else if (!$("#lAngle").value) hint = "בחר זווית.";
   else if (noCopy) hint = "לזווית הזו עוד אין טקסט ראשי. הוסף בהגדרות.";
   else if (!$("#lConcept").value && !$("#lAdset").value) hint = "בחר קונספט.";
-  else if (!adset) hint = "חסר תקציב יומי לאד-סט החדש.";
+  else if (!adset) hint = "בחר קונספט.";
   $("#submitHint").textContent = hint;
 }
 
@@ -795,11 +816,13 @@ $("#submitBtn").addEventListener("click", async () => {
     batchId, productId:p.id, productName:p.name, angleId:a.id, angleName:a.name,
     conceptKey: tg.concept?.key || "", conceptName: tg.concept?.name || "",
     adSetId: tg.adSetId || "", adSetName: tg.adSetName || "",
-    newAdSet: tg.newAdSet ? { name: $("#lNewAdsetName").value.trim() || tg.concept.name, dailyBudget: Number($("#lNewAdsetBudget").value) || null, campaignId: p.campaignId || "" } : null,
-    launchStatus: $("#lStatus").value, tag: $("#lTag").value.trim(), note: $("#lNote").value.trim(),
+    findAdSet: tg.newAdSet ? { name: tg.concept.name, campaignId: p.campaignId || "" } : null,
+    scheduledAt: whenMs(),
+    launchStatus: $("#lStatus").value, note: $("#lNote").value.trim(),
     status:"pending", createdAt: Date.now(), createdBy: myId || null
   };
   let done = 0, failed = [], sentBytes = 0;
+  const names = adNames(files);
   for (const f of files){
     const label = `מעלה ${done+1}/${total}: ${f.name}`;
     $("#submitHint").textContent = label;
@@ -811,7 +834,7 @@ $("#submitBtn").addEventListener("click", async () => {
       let posterAssetId = null;
       if (f.type.startsWith("video/") || /\.(mp4|mov)$/i.test(f.name)) try { const poster = await capturePoster(f); if (poster) posterAssetId = (await withRetry(() => assets.upload(poster, {type:"image/jpeg"}))).id; } catch(e){}
       await db.collection("queue").add({ ...base, source:"asset", chunks: up.chunks, videoAssetId: up.chunks.length === 1 && up.mime.startsWith("video/") ? up.chunks[0].id : null,
-        posterAssetId: posterAssetId || (up.mime.startsWith("image/") && up.chunks.length === 1 ? up.chunks[0].id : null), mediaType: up.mime.startsWith("image/") ? "image" : "video", fileName:f.name, mimeType: up.mime, sizeBytes:f.size, needsCompression: up.mime.startsWith("video/") && f.size > META_CAP, createdAt: Date.now() });
+        posterAssetId: posterAssetId || (up.mime.startsWith("image/") && up.chunks.length === 1 ? up.chunks[0].id : null), mediaType: up.mime.startsWith("image/") ? "image" : "video", fileName:f.name, adName: names.get(f), mimeType: up.mime, sizeBytes:f.size, needsCompression: up.mime.startsWith("video/") && f.size > META_CAP, createdAt: Date.now() });
     } catch(e){ failed.push(f.name + " (" + (e.code || e.message || "שגיאה") + ")"); }
     sentBytes += f.size; done++; bar.style.width = (done/total*100) + "%";
   }
@@ -827,7 +850,7 @@ $("#submitBtn").addEventListener("click", async () => {
   }
   const okN = total - failed.length;
   S.files = S.files.filter(f => f.size > MAX_FILE); renderFiles();
-  $("#driveLinks").value = ""; $("#lTag").value = ""; $("#lNote").value = "";
+  $("#driveLinks").value = ""; $("#lNote").value = ""; $("#lWhen").value = ""; updateWhen();
   toast(okN ? `${okN} נכנסו לתור` : "שום דבר לא נכנס לתור");
   validateLaunch();
   if (okN) $('nav.tabs button[data-tab="queue"]').click();
@@ -854,14 +877,17 @@ function renderQueue(){
       : h("div",{class:"ph"}, q.source === "drive" ? "Drive" : "וידאו");
     const meta = h("div",{class:"q-meta"},
       h("b",{text:q.productName||""}), " · ", q.angleName || "", h("br"),
-      q.conceptName ? "קונספט: " + q.conceptName : "", q.newAdSet ? ` · אד-סט חדש${q.newAdSet.dailyBudget ? " ₪"+q.newAdSet.dailyBudget+"/יום" : ""}` : (q.adSetName && q.adSetName !== q.conceptName) ? " · אד-סט: " + q.adSetName : "",
+      q.conceptName ? "קונספט: " + q.conceptName : "", (q.adSetName && q.adSetName !== q.conceptName) ? " · אד-סט: " + q.adSetName : "",
       " · ", q.mediaType === "image" ? "תמונה · " : "", q.launchStatus === "ACTIVE" ? "פעילה" : "כבויה", h("br"),
       fmtTime(q.createdAt), q.sizeBytes ? " · " + fmtMB(q.sizeBytes) : "", (q.chunks||[]).length > 1 ? ` · ${q.chunks.length} חלקים` : "");
     const body = h("div",{class:"q-body"},
       h("div",{style:"display:flex;gap:8px;align-items:center;justify-content:space-between"},
         h("div",{class:"q-title",text:q.adName || q.fileName || ""}),
-        h("span",{class:"pill " + (q.status||"neutral")}, ST[q.status] || q.status || "")),
+        (q.status === "pending" && q.scheduledAt && q.scheduledAt > Date.now())
+          ? h("span",{class:"pill processing"}, "מתוזמן")
+          : h("span",{class:"pill " + (q.status||"neutral")}, ST[q.status] || q.status || "")),
       meta);
+    if (q.scheduledAt) body.append(h("div",{class:"q-meta"},"עולה ב-" + fmtTime(q.scheduledAt)));
     if (q.note) body.append(h("div",{class:"q-meta"},"הערה: " + q.note));
     if (q.adId) body.append(h("div",{class:"q-meta mono"},"Ad ID: " + q.adId));
     if (q.error) body.append(h("div",{class:"q-err",text:q.error}));
