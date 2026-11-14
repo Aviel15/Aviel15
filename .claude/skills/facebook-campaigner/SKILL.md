@@ -15,7 +15,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 | חשבון מודעות | `800413478935513` (Mayro, ILS) |
 | עמוד ראשי | Mayro - מאיירו `410155838840115` |
 | עמודים נוספים | גברים אמיתיים ממליצים `1346342818559497` · אמהות בודקות וממליצות `1343145742209647` |
-| אינסטגרם | אין חשבון IG מקושר לחשבון המודעות (המודעות רצות באינסטגרם בשם העמוד) |
+| אינסטגרם | mayro.il, `instagram_user_id` = `17841460942215256` (נלקח מהקריאייטיבים הקיימים; `ads_get_ig_accounts` מחזיר ריק) |
 | פיקסל | Mayro Pixel `780716898210630` |
 | דומיין | mayro-il.com, Domain ID `2929779687223296` |
 | חשבון מושבת | `619416970748434` (SMX) - לא לגעת |
@@ -34,19 +34,34 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 | שדה | ערך |
 |---|---|
 | קישור | דף המוצר (למכשיר האדים: `https://www.mayro-il.com/products/%D7%9E%D7%9B%D7%A9%D7%99%D7%A8-%D7%90%D7%93%D7%99%D7%9D`) |
-| Primary text | 2 הווריאציות הקבועות של הזווית (נשמרות במשגר, collection `angles`) |
+| Primary text | 2 הווריאציות הקבועות של הזווית. מילה במילה מ-`steam-copy.md` (וגם במשגר, collection `angles`). לבחור לפי הזווית שנבחרה בדרופ-דאון, ולא לערבב בין זוויות |
 | Headline | תמיד 2: `הקלה ביובש בעיניים תוך 5 דקות מהבית` · `30 ימי אחריות. לא אהבת? לא שילמת.` (מכשיר האדים) |
 | Description | תמיד ריק |
 | CTA | תמיד `ORDER_NOW` |
 | URL parameters | `utm_source={{site_source_name}}&utm_medium={{adset.name}}&utm_campaign={{campaign.name}}&utm_content={{ad.name}}` (תמיד, בדיוק ככה) |
-| Display link | mayro-il.com |
+| Display link | www.mayro-il.com |
 | סטטוס | לפי מה שנבחר בתור (ברירת מחדל PAUSED) |
 
 **שם המודעה** = שם הקובץ בלי סיומת. אם השם לא נגמר ב-`_מספר`, מוסיפים `_1`, `_2`… לפי הסדר. בדרייב זה מסודר כך: תיקייה לכל זווית ובתוכה הוקים, למשל `זווית 1 טיפות_1`, `זווית 1 טיפות_2`, `זווית 1 טיפות_3` (כל קובץ = הוק אחר = מודעה אחרת). המשגר כבר מחשב את השם ושומר אותו ב-`adName`.
 
-**זוויות מכשיר האדים**: 1 תלות בטיפות (`steam-a1`) · 2 עיניים דומעות ושורפות (`steam-a2`) · 3 צריבה ותחושת חול (`steam-a3`).
+**זוויות מכשיר האדים**: 1 תלות בטיפות (`steam-a1`) · 2 עיניים דומעות ושורפות (`steam-a2`) · 3 צריבה ותחושת חול (`steam-a3`). הטקסטים המלאים ב-[steam-copy.md](steam-copy.md).
 
-## 4. אופטימיזציות: הכול כבוי
+## 4. הגדרות קבועות ואופטימיזציות: הכול כבוי
+
+**Ad setup**:
+- Create ad, Manual upload, Single image or video.
+- Multi-advertiser ads: **כבוי**.
+
+**Identity**:
+- Facebook Page: Mayro - מאיירו `410155838840115`.
+- Instagram profile: mayro.il `17841460942215256`.
+- Threads: Use Instagram account.
+- WhatsApp: Use Facebook Page.
+
+**Personalized destinations**: Optimize website destination, Product browsing ו-Browser add-ons, שלושתם **Off**.
+
+**שימו לב**: בקריאייטיבים קיימים מופיעים `translate_voiceover` ו-`ig_video_native_subtitle` דלוקים. במודעות חדשות שלנו הם חייבים להיות כבויים.
+
 
 לפי צילומי המסך של אביאל, בכל מודעה:
 - Creative setup **0/3**: Site links, Summaries, Website highlights כבויים.
@@ -77,9 +92,14 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 4. **העלאה למטא**: `ads_create_upload_url`, ואז curl POST עם כל ה-headers ו-`--data-binary`, ואז `ads_finalize_upload`.
    - וידאו: להמתין ב-`ads_get_ad_videos` עד `ready`.
    - Thumbnail: מה-poster (להוריד את `posterAssetId` ולהעלות כ-image/jpeg).
-   - דורש שהסביבה תאפשר את `rupload.facebook.com`.
+   - `rupload.facebook.com` פתוח בסביבה "מעקב מוצרים" (נבדק: HTTP 200).
 5. **אד-סט**: `adSetId`; אחרת למצוא ב-`ads_get_ad_entities` אד-סט בשם הקונספט בתוך קמפיין `TESTING | ABO | <מוצר>`. אם לא נמצא: `error` עם הסבר, ולא ליצור.
-6. `ads_create_creative`: page_id (של המוצר או הראשי), video_id/image_hash, primary_texts=זווית, headlines=זווית, בלי descriptions, link_url=מוצר, CTA=ORDER_NOW, url_tags=UTM, display_link, וכל האופטימיזציות כבויות.
+6. `ads_create_creative` עם השדות הבאים:
+   - page_id=`410155838840115`, instagram_user_id=`17841460942215256`.
+   - video_id או image_hash.
+   - primary_texts: 2 הטקסטים של הזווית. headlines: 2 הכותרות. בלי descriptions.
+   - link_url: דף המוצר. CTA: ORDER_NOW. url_tags: ה-UTM. display_link: www.mayro-il.com.
+   - כל האופטימיזציות כבויות, וגם multi-advertiser ו-personalized destinations.
 7. `ads_create_ad` עם `ad_name=adName`, PAUSED. אם `launchStatus=ACTIVE`, להפעיל עם `ads_activate_entity` (או בזמן `scheduledAt`).
 8. `update` ל-`done` עם `adId`, `creativeId`, `processedAt`. בשגיאה: `error` + `error` טקסט קצר בעברית.
 9. אחרי done: למחוק את חלקי הוידאו מהאחסון של הארטיפקט (`Artifact delete` + `path`) כדי לפנות מקום. את ה-poster להשאיר.
