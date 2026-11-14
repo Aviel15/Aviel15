@@ -26,6 +26,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 - **קמפיין טסטים ABO אחד לכל מוצר**: `TESTING | ABO | <שם המוצר>` (למשל `TESTING | ABO | Bamboo Boxer`, `TESTING | ABO | Bright Soap`). מטרה: מכירות, אופטימיזציה לרכישה (OFFSITE_CONVERSIONS).
 - **אד-סט לכל קונספט**: `Voice over` / `AI Animation` / `Static Images` / `Ugly Ads` (בחשבון קיימים גם שמות כמו VO, AI, Image statics, Ugly ads Video). כמה זוויות יכולות לשבת באותו אד-סט.
+- **מכשיר האדים**: קמפיין `TESTING | ABO | מכשיר אדים` = `120272609217950362`, אד-סט `Voice over` = `120272609217940362`, ו-`Static Images` (ה-ID ייאסף אחרי פרסום). בינתיים רק 2 הקונספטים האלה.
 - **תקציבים**: אביאל מגדיר אותם בעצמו. לא לגעת בתקציב, לא ליצור קמפיין ולא ליצור אד-סט בלי בקשה מפורשת. אם האד-סט של הקונספט לא קיים, משאירים את הפריט בתור עם הערה ושואלים.
 - **אף פעם לא תמונה וסרטון באותו אד-סט.** Static Images = רק תמונות.
 
@@ -70,7 +71,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 - Essential enhancements **0/3**: Relevant comments, Enhance CTA, Add video effects כבויים.
 - Related media **0/10**: כבוי לגמרי.
 
-ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI (`self_ai_disclosure`) לפי `config.aiDisclosure`; אם ריק, שואלים ולא מנחשים.
+ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: **לא לסמן כנוצר ב-AI** (`self_ai_disclosure=OPT_OUT`), כולל ב-AI Animation. כך החליט אביאל.
 
 ## 5. משגר המודעות (הממשק)
 
