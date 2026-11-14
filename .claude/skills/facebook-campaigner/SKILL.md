@@ -81,7 +81,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 - Essential enhancements **0/3**: Relevant comments, Enhance CTA, Add video effects כבויים.
 - Related media **0/10**: כבוי לגמרי.
 
-ביישום: ה-`degrees_of_freedom_spec` עם OPT_OUT לכל feature נכנס בתוך ה-creative ה-inline (סעיף 5, שלב 6). אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
+ביישום: ה-`degrees_of_freedom_spec` עם OPT_OUT לכל feature, וגם `creative_sourcing_spec.catalog` OPT_OUT (= Show products כבוי, מטא מדליקה אותו לבד בכל העלאה), נכנסים בתוך ה-creative (סעיף 5, שלב 6). אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
 
 **degrees_of_freedom_spec שעבר אימות** (המאפיין `music` נדחה, לא לשלוח אותו):
 `{"creative_features_spec":{"text_optimizations","enhance_cta","inline_comment","image_brightness_and_contrast","video_auto_crop","adapt_to_placement","add_text_overlay","description_automation","site_extensions","product_extensions","text_translation","reveal_details_over_time","show_summary","image_touchups","image_animation","translate_voiceover","ig_video_native_subtitle"}}`. כל אחד מהם עם `{"enroll_status":"OPT_OUT"}`.
@@ -111,27 +111,46 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - Thumbnail: מה-poster (להוריד את `posterAssetId` ולהעלות כ-image/jpeg).
    - `rupload.facebook.com` פתוח בסביבה "מעקב מוצרים" (נבדק: HTTP 200).
 5. **אד-סט**: `adSetId`; אחרת למצוא ב-`ads_get_ad_entities` אד-סט בשם הקונספט בתוך קמפיין `TESTING | ABO | <מוצר>`. אם לא נמצא: `error` עם הסבר, ולא ליצור.
-6. **אין לקרוא ל-`ads_create_creative`.** קריאייטיב שנוצר עם `primary_texts` מוצג ב-Ads Manager שבור: Media ריק, CTA "No button", אינסטגרם ריק, WhatsApp עם מספר הטלפון. התצוגה המקדימה תקינה, אבל העורך לא. **הפורמט שעובד ונראה נכון בעורך** הוא inline creative בפורמט Ads Manager, שמעבירים ישירות ל-`ads_create_ad` בשדה `creative` (JSON):
+6. **הקריאייטיב: פורמט Ads Manager שאומת** (הועתק אחד לאחד מהמודעה הידנית של אביאל "דוגמה להעלאת מודעה עובדת", ונבדק על 6 מודעות ב-14/11/2026: Media, Destination, אינסטגרם, Order now ושתי הכותרות מוצגים נכון בעורך, `active_errors` ריק).
+   - **אין לקרוא ל-`ads_create_creative`.** קריאייטיב עם `primary_texts` נראה תקין בתצוגה המקדימה, אבל בעורך Media ריק ו-CTA "No button".
+   - **אין לשלוח `asset_feed_spec` לבד.** בלי `media_sourcing_spec` ו-`video_data` העורך ריק לגמרי.
+   - מעבירים את ה-JSON הזה ישירות ל-`ads_create_ad` בשדה `creative`. לתיקון מודעה קיימת: `ads_update_entity` עם `fields={"creative":{...}}`.
 ```json
-{"object_story_spec":{"page_id":"410155838840115","instagram_user_id":"17841462817997998"},
- "asset_feed_spec":{
-   "videos":[{"video_id":"<VIDEO_ID>","thumbnail_hash":"<THUMB_HASH>"}],
+{"object_story_spec":{"page_id":"410155838840115","instagram_user_id":"17841462817997998",
+   "video_data":{"video_id":"<VID>","image_hash":"<THUMB_HASH>",
+     "call_to_action":{"type":"ORDER_NOW","value":{"link":"<דף המוצר>"}}}},
+ "media_sourcing_spec":{
    "bodies":[{"text":"<טקסט ראשי 1>"},{"text":"<טקסט ראשי 2>"}],
-   "titles":[{"text":"הקלה ביובש בעיניים תוך 5 דקות מהבית"},{"text":"30 ימי אחריות. לא אהבת? לא שילמת."}],
+   "titles":[{"text":"<כותרת 1>"},{"text":"<כותרת 2>"}],
+   "images":[],
+   "videos":[{"video_id":"<VID>","original_video_id":"<VID>","source":"multi_media","opt_in_status":"opt_in"}]},
+ "asset_feed_spec":{
+   "bodies":[...אותם 2 טקסטים...],"titles":[...אותן 2 כותרות...],
+   "videos":[{"video_id":"<VID>","thumbnail_hash":"<THUMB_HASH>"}],
    "link_urls":[{"website_url":"<דף המוצר>","display_url":"www.mayro-il.com"}],
-   "call_to_action_types":["ORDER_NOW"],
-   "ad_formats":["SINGLE_VIDEO"],
-   "optimization_type":"DEGREES_OF_FREEDOM"},
+   "call_to_action_types":["ORDER_NOW"],"ad_formats":["SINGLE_VIDEO"],"optimization_type":"DEGREES_OF_FREEDOM"},
  "url_tags":"utm_source={{site_source_name}}&utm_medium={{adset.name}}&utm_campaign={{campaign.name}}&utm_content={{ad.name}}",
- "degrees_of_freedom_spec":{"creative_features_spec":{ ...כל 17 המאפיינים: OPT_OUT... }},
+ "degrees_of_freedom_spec":{"creative_features_spec":{ ...17 המאפיינים מסעיף 4, כל אחד {"enroll_status":"OPT_OUT"}... }},
+ "destination_spec":{"native_commerce_experience":{"product_browsing":{"enroll_status":"OPT_OUT"}},
+   "website":{"optimization":{"status":"OPT_OUT","type":"website_destination_optimization"}}},
+ "creative_sourcing_spec":{"catalog":{"enroll_status":"OPT_OUT"},"dynamic_site_links_spec":{"enroll_status":"OPT_OUT"},
+   "brand":{"enroll_status":"OPT_OUT"},"website_summary_spec":{"enroll_status":"OPT_OUT"},
+   "featured_offering_spec":{"enroll_status":"OPT_OUT"},"website_media_spec":{"enroll_status":"OPT_OUT"}},
  "wamo_whatsapp_identity_spec":{"wamo_whatsapp_identity_id":"410155838840115"},
- "contextual_multi_ads":{"enroll_status":"OPT_OUT"}}
+ "contextual_multi_ads":{"enroll_status":"OPT_OUT"},
+ "object_type":"VIDEO"}
 ```
-   - תמונה (Static Images): `"images":[{"hash":"<IMAGE_HASH>"}]` במקום `videos`, ו-`"ad_formats":["SINGLE_IMAGE"]`.
-   - `wamo_whatsapp_identity_spec` עם מזהה העמוד = "WhatsApp: Use Facebook Page". בלעדיו מטא מציבה את מספר הטלפון.
-   - בלי `descriptions`.
-   - ⚠️ **לא מאומת. אסור להשתמש בו עד שיוחלף.** ה-API קיבל את הפורמט הזה בלי שגיאות, אבל בעורך של Ads Manager הטיוטה מוצגת ריקה: אין Media, אין Destination, אין אינסטגרם, CTA "No button", והתצוגה המקדימה ריקה. הגרסה הקודמת (`ads_create_creative`) הציגה תצוגה מקדימה תקינה, אבל בעורך Media ו-CTA היו ריקים.
-   - **הדרך הנכונה:** לקרוא מודעה שאביאל בנה ידנית ב-Ads Manager באותה טיוטה (`ads_get_ad_entities` עם `object_state=draft`), ולהעתיק את מבנה ה-`creative` שלה אחד לאחד. עד שזה נעשה, עוצרים את ההעלאה האוטומטית.
+   - **מה כל חלק עושה בעורך:**
+     - `media_sourcing_spec`: ממנו העורך קורא Media, Primary text ו-Headline. בלעדיו השדות ריקים.
+     - `video_data.call_to_action` עם `link`: ממנו העורך קורא את ה-CTA (Order now) ואת ה-Destination. בלעדיו מופיע "No button" והשגיאה "link field is required".
+     - `creative_sourcing_spec.catalog` OPT_OUT: **מכבה את Show products.** מטא מדליקה אותו אוטומטית בכל העלאת קריאייטיב, ולכן שולחים אותו **בכל מודעה, בלי יוצא מן הכלל**. גם `featured_offering_spec` OPT_OUT (במודעה הידנית הוא היה OPT_IN).
+     - `destination_spec`: מכבה את Product browsing ואת Optimize website destination.
+     - `wamo_whatsapp_identity_spec` עם מזהה העמוד = "WhatsApp: Use Facebook Page". בלעדיו מטא שמה את מספר הטלפון.
+   - **כותרות: תמיד 2 ולעולם לא ריק.** לוקחים מ-`angles/<id>.headlines`. אם הרשימה ריקה, משתמשים בשתי הכותרות הקבועות מסעיף 3. בלי כותרות אביאל צריך למלא ידנית.
+   - בלי `descriptions`. בלי `media_optimization_spec` (במודעה הידנית auto_video_truncation היה דלוק, אנחנו משמיטים אותו).
+   - `<THUMB_HASH>` = ה-hash של ה-poster שהועלה כ-image/jpeg (שלב 4).
+   - **תמונה (Static Images): עדיין לא אומת.** לפני העלאת תמונה ראשונה, לבקש מאביאל לבנות מודעת תמונה אחת ידנית בטיוטה, לקרוא אותה ולהעתיק את המבנה, בדיוק כמו שנעשה בווידאו.
+   - **אימות אחרי כל מודעה:** קריאה ב-`ads_get_ad_entities` עם `object_state=draft` ו-`object_ids=[adId]`. הפלט ארוך (~100KB), לכן שומרים לקובץ ומנתחים ב-python. בודקים: `video_data.call_to_action.type=ORDER_NOW` עם link, `instagram_user_id`, 2 titles, `catalog` OPT_OUT, סטטוס PAUSED.
 7. `ads_create_ad` עם `ad_name=adName`, ו-`creative` = ה-JSON מסעיף 6. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
    - **מצב טיוטה (ברירת המחדל של אביאל)**: הקמפיין נשאר טיוטה בכוונה. אם האד-סט קיים רק בטיוטה (`ads_get_ad_entities` עם `object_state=draft`), `ads_create_ad` מכניס את המודעה לטיוטה ומחזיר `status=DRAFT`. לבדוק `active_errors` ולתקן עם `ads_update_entity`.
    - **לא לפרסם** (`ads_activate_entity` על הקמפיין) בלי בקשה מפורשת. אביאל מפרסם בעצמו. בפרסום כל המודעות עולות ACTIVE.
@@ -220,3 +239,4 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 3. האד-סט קיים. האם הוא כבר רץ? אם כן, להזכיר איפוס למידה.
 4. כמות המודעות באד-סט אחרי ההוספה: מעל 6 → להזהיר.
 5. UTM, CTA ו-Headlines בדיוק כמו בסעיף 3. Description ריק.
+6. ב-creative יש `media_sourcing_spec`, `video_data.call_to_action` עם link, ו-`creative_sourcing_spec.catalog` OPT_OUT (Show products כבוי). אחרי היצירה: קריאת טיוטה לאימות (סעיף 5, שלב 6).
