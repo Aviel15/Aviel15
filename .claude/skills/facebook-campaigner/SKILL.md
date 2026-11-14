@@ -8,6 +8,16 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 אביאל הוא יזם איקומרס ישראלי (מותג MAYRO). מדברים איתו בעברית, ישר לעניין, בלי הקדמות.
 הסקיל הזה מכיל את כל ההגדרות הקבועות. אל תשאל שוב דברים שכתובים כאן.
 
+## 0. מקור האמת: קודם קוראים את המשגר
+
+כל מה שמשתנה (מזהי קמפיין ואד-סטים, מוצרים, זוויות, קופי, קונספטים, UTM, גילוי AI) נשמר ב-db של המשגר. לכן הסקיל לא צריך עדכון בכל שינוי.
+
+**בתחילת כל משימה**, עם `ArtifactData` ו-`url` = `https://claude.ai/artifact/5FGAHTubpdL7xADDKrL5kU`:
+1. `get` את `config/main`.
+2. `list` את `products` ואת `angles`.
+
+אם יש סתירה בין ה-db לבין הסקיל, **ה-db גובר**. שינוי שאביאל מבקש (מזהה חדש, זווית חדשה, קופי חדש) נכנס ל-db, לא לסקיל.
+
 ## 1. נכסים קבועים
 
 | מה | ערך |
@@ -26,7 +36,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 - **קמפיין טסטים ABO אחד לכל מוצר**: `TESTING | ABO | <שם המוצר>` (למשל `TESTING | ABO | Bamboo Boxer`, `TESTING | ABO | Bright Soap`). מטרה: מכירות, אופטימיזציה לרכישה (OFFSITE_CONVERSIONS).
 - **אד-סט לכל קונספט**: `Voice over` / `AI Animation` / `Static Images` / `Ugly Ads` (בחשבון קיימים גם שמות כמו VO, AI, Image statics, Ugly ads Video). כמה זוויות יכולות לשבת באותו אד-סט.
-- **מכשיר האדים**: קמפיין `TESTING | ABO | מכשיר אדים` = `120272609217950362` (**טיוטה**). אד-סט `Voice over` = `120272609217940362` (טיוטה, 60₪ ליום). אד-סט `Static Images`: עדיין לא נמצא בטיוטה; לחפש לפי שם ולשמור את ה-ID ב-`products/steam.conceptAdsets.IMG`. בינתיים רק 2 הקונספטים האלה.
+- **מזהי קמפיין ואד-סטים**: ב-`products/<id>.campaignId` וב-`products/<id>.conceptAdsets` (למשל `{"VO": "<adSetId>"}`). אם חסר מזהה, מחפשים לפי שם הקונספט בתוך הקמפיין (גם עם `object_state=draft`) ושומרים אותו ב-db.
 - **תקציבים**: אביאל מגדיר אותם בעצמו. לא לגעת בתקציב, לא ליצור קמפיין ולא ליצור אד-סט בלי בקשה מפורשת. אם האד-סט של הקונספט לא קיים, משאירים את הפריט בתור עם הערה ושואלים.
 - **אף פעם לא תמונה וסרטון באותו אד-סט.** Static Images = רק תמונות.
 
@@ -45,7 +55,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 **שם המודעה** = שם הקובץ בלי סיומת. אם השם לא נגמר ב-`_מספר`, מוסיפים `_1`, `_2`… לפי הסדר. בדרייב זה מסודר כך: תיקייה לכל זווית ובתוכה הוקים, למשל `זווית 1 טיפות_1`, `זווית 1 טיפות_2`, `זווית 1 טיפות_3` (כל קובץ = הוק אחר = מודעה אחרת). המשגר כבר מחשב את השם ושומר אותו ב-`adName`.
 
-**זוויות מכשיר האדים**: 1 תלות בטיפות (`steam-a1`) · 2 עיניים דומעות ושורפות (`steam-a2`) · 3 צריבה ותחושת חול (`steam-a3`). הטקסטים המלאים ב-[steam-copy.md](steam-copy.md).
+**זוויות מכשיר האדים**: 1 תלות בטיפות (`steam-a1`) · 2 עיניים דומעות ושורפות (`steam-a2`) · 3 צריבה ותחושת חול (`steam-a3`). הקופי הקובע נמצא ב-db (`angles/<id>.primaryTexts`). [steam-copy.md](steam-copy.md) הוא גיבוי בלבד.
 
 ## 4. הגדרות קבועות ואופטימיזציות: הכול כבוי
 
@@ -71,7 +81,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 - Essential enhancements **0/3**: Relevant comments, Enhance CTA, Add video effects כבויים.
 - Related media **0/10**: כבוי לגמרי.
 
-ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: **לא לסמן כנוצר ב-AI** (`self_ai_disclosure=OPT_OUT`), כולל ב-AI Animation. כך החליט אביאל.
+ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
 
 ## 5. משגר המודעות (הממשק)
 
