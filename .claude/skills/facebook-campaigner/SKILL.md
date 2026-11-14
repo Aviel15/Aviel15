@@ -83,6 +83,11 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 ביישום: ב-`ads_create_ad` להעביר `advantage_plus_creative_defaults=OFF`; ב-`ads_create_creative` להעביר `advantage_plus_creative=false` ו-`degrees_of_freedom_spec` עם OPT_OUT לכל feature רלוונטי. לפני השימוש לאמת את שמות השדות מול `ads_get_field_context`. אחרי יצירה, לבדוק ב-`ads_get_ad_preview` או בקריאת הקריאייטיב שאין שיפור שנדלק. גילוי AI: לפי `config.aiDisclosure` (כרגע `OPT_OUT`, כלומר לא לסמן כנוצר ב-AI, כולל ב-AI Animation). אם ריק, שואלים.
 
+**degrees_of_freedom_spec שעבר אימות** (המאפיין `music` נדחה, לא לשלוח אותו):
+`{"creative_features_spec":{"text_optimizations","enhance_cta","inline_comment","image_brightness_and_contrast","video_auto_crop","adapt_to_placement","add_text_overlay","description_automation","site_extensions","product_extensions","text_translation","reveal_details_over_time","show_summary","image_touchups","image_animation","translate_voiceover","ig_video_native_subtitle"}}`. כל אחד מהם עם `{"enroll_status":"OPT_OUT"}`.
+
+**אינסטגרם**: אם מטא מחזירה "Ad account has no access to this Instagram account", צריך לחבר את mayro.il לחשבון המודעות ב-Business Settings. מסמנים error עם הסבר ולא יוצרים מודעה בלי אינסטגרם.
+
 ## 5. משגר המודעות (הממשק)
 
 - דף: https://claude.ai/artifact/5FGAHTubpdL7xADDKrL5kU (קוד המקור: `ad-launcher.html` בריפו `aviel15/aviel15`).
@@ -100,7 +105,8 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - source=asset: להוריד כל חלק עם `Artifact read` + `path=<chunk id>`, ולחבר לפי הסדר: `cat part1 part2 … > file`. לאמת גודל ו-sha256 מול `chunks`.
    - source=drive: להוריד עם Google Drive MCP. לתיקייה, לפרוש לקבצים, וכל קובץ = מודעה.
    - וידאו מעל 100MB (`needsCompression`): לדחוס עם ffmpeg, H.264 + AAC, אותה רזולוציה, CRF/bitrate עד שיורד מתחת ל-95MB.
-4. **העלאה למטא**: `ads_create_upload_url`, ואז curl POST עם כל ה-headers ו-`--data-binary`, ואז `ads_finalize_upload`.
+4. **אם בשורה כבר יש `metaVideoId`/`metaThumbHash`** (הרצה קודמת שנכשלה אחרי ההעלאה), מדלגים על שלבים 3 ו-4 ומשתמשים בהם.
+   **העלאה למטא**: `ads_create_upload_url`, ואז curl POST עם כל ה-headers ו-`--data-binary`, ואז `ads_finalize_upload`.
    - וידאו: להמתין ב-`ads_get_ad_videos` עד `ready`.
    - Thumbnail: מה-poster (להוריד את `posterAssetId` ולהעלות כ-image/jpeg).
    - `rupload.facebook.com` פתוח בסביבה "מעקב מוצרים" (נבדק: HTTP 200).

@@ -193,9 +193,9 @@ details.how summary{cursor:pointer;font-weight:700}
   <!-- ============ QUEUE ============ -->
   <section class="view" id="view-queue">
     <div class="card" id="queueCta">
-      <h2>להעלאה למטא</h2>
+      <h2>העלאה אוטומטית למטא</h2>
       <p class="hint" id="queueCtaText">אין כרגע מודעות שממתינות.</p>
-      <button class="btn primary block" id="copyCmd">העתק פקודה לקלוד</button>
+      <button class="btn primary block" id="copyCmd">העלה עכשיו</button>
       <p class="hint" id="usage" style="margin:10px 0 0;text-align:center"></p>
     </div>
     <div class="chips" id="qFilters">
@@ -856,7 +856,8 @@ $("#submitBtn").addEventListener("click", async () => {
   const okN = total - failed.length;
   S.files = S.files.filter(f => f.size > MAX_FILE); renderFiles();
   $("#driveLinks").value = ""; $("#lNote").value = ""; $("#lWhen").value = ""; updateWhen();
-  toast(okN ? `${okN} נכנסו לתור` : "שום דבר לא נכנס לתור");
+  if (okN) { pokeUploader("submit").then(ok => toast(ok ? `${okN} בתור. קלוד מעלה אותן למטא עכשיו` : `${okN} בתור. יעלו בבדיקה הקבועה (עד שעה)`)); }
+  else toast("שום דבר לא נכנס לתור");
   validateLaunch();
   if (okN) $('nav.tabs button[data-tab="queue"]').click();
 });
@@ -870,7 +871,7 @@ function renderQueue(){
   const pending = S.queue.filter(q => q.status === "pending").length;
   const proc = S.queue.filter(q => q.status === "processing").length;
   const pc = $("#pendingCount"); pc.hidden = !pending; pc.textContent = pending;
-  $("#queueCtaText").textContent = pending ? `${pending} מודעות ממתינות. העתק את הפקודה והדבק בצ'אט עם קלוד.` + (proc ? ` (${proc} בעבודה כרגע)` : "") : proc ? `${proc} בעבודה כרגע.` : "אין כרגע מודעות שממתינות.";
+  $("#queueCtaText").textContent = (pending ? `${pending} ממתינות. הן עולות למטא אוטומטית תוך כמה דקות` + (proc ? `, ${proc} בעבודה כרגע.` : ".") : proc ? `${proc} בעבודה כרגע.` : "אין כרגע מודעות שממתינות.") + " בנוסף יש בדיקה קבועה כל שעה.";
   $("#copyCmd").disabled = !pending;
   renderUsage();
   const list = $("#queueList"); list.textContent = "";
@@ -922,15 +923,26 @@ function renderQueue(){
     list.append(h("div",{class:"card q-item"}, media, body));
   }
 }
+const TRIGGER_ID = "trig_01Dn4LVK4qkKMELmZBuPNGcB";
+let mcpNs, lastPoke = 0;
+async function pokeUploader(reason){
+  try {
+    if (mcpNs === undefined) mcpNs = window.claude && window.claude.use ? await window.claude.use("mcp") : null;
+    if (!mcpNs) return false;
+    if (Date.now() - lastPoke < 20000) return true;
+    lastPoke = Date.now();
+    await mcpNs.callTool("Claude Code Remote", "fire_trigger", { trigger_id: TRIGGER_ID, text: "נשלחו פריטים חדשים לתור (" + reason + "). תעלה אותם עכשיו." });
+    return true;
+  } catch(e){ lastPoke = 0; return false; }
+}
 let usageT = 0;
 async function renderUsage(){
   if (!assets || Date.now() - usageT < 15000) return; usageT = Date.now();
   try { const u = (await assets.list()).usage; if (u && u.maxBytes) $("#usage").textContent = `אחסון: ${fmtMB(u.bytes)} מתוך ${fmtMB(u.maxBytes)} בשימוש`; } catch(e){}
 }
 $("#copyCmd").addEventListener("click", async () => {
-  const txt = "תעלה את התור ממשגר המודעות";
-  try { await navigator.clipboard.writeText(txt); toast("הועתק. הדבק בצ'אט עם קלוד"); }
-  catch(e){ toast("כתוב לקלוד: " + txt); }
+  const ok = await pokeUploader("manual");
+  toast(ok ? "קלוד התחיל להעלות. הסטטוס יתעדכן כאן" : "לא הצלחתי להעיר את קלוד. הבדיקה הקבועה תעלה תוך שעה");
 });
 
 /* ---------- setup completeness ---------- */
