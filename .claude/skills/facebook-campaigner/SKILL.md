@@ -130,7 +130,8 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - תמונה (Static Images): `"images":[{"hash":"<IMAGE_HASH>"}]` במקום `videos`, ו-`"ad_formats":["SINGLE_IMAGE"]`.
    - `wamo_whatsapp_identity_spec` עם מזהה העמוד = "WhatsApp: Use Facebook Page". בלעדיו מטא מציבה את מספר הטלפון.
    - בלי `descriptions`.
-   - נבדק על 3 המודעות הראשונות (עדכון בטיוטה עם `ads_update_entity` → `fields={"creative":{...}}`): עבר בלי שגיאות.
+   - ⚠️ **לא מאומת. אסור להשתמש בו עד שיוחלף.** ה-API קיבל את הפורמט הזה בלי שגיאות, אבל בעורך של Ads Manager הטיוטה מוצגת ריקה: אין Media, אין Destination, אין אינסטגרם, CTA "No button", והתצוגה המקדימה ריקה. הגרסה הקודמת (`ads_create_creative`) הציגה תצוגה מקדימה תקינה, אבל בעורך Media ו-CTA היו ריקים.
+   - **הדרך הנכונה:** לקרוא מודעה שאביאל בנה ידנית ב-Ads Manager באותה טיוטה (`ads_get_ad_entities` עם `object_state=draft`), ולהעתיק את מבנה ה-`creative` שלה אחד לאחד. עד שזה נעשה, עוצרים את ההעלאה האוטומטית.
 7. `ads_create_ad` עם `ad_name=adName`, ו-`creative` = ה-JSON מסעיף 6. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
    - **מצב טיוטה (ברירת המחדל של אביאל)**: הקמפיין נשאר טיוטה בכוונה. אם האד-סט קיים רק בטיוטה (`ads_get_ad_entities` עם `object_state=draft`), `ads_create_ad` מכניס את המודעה לטיוטה ומחזיר `status=DRAFT`. לבדוק `active_errors` ולתקן עם `ads_update_entity`.
    - **לא לפרסם** (`ads_activate_entity` על הקמפיין) בלי בקשה מפורשת. אביאל מפרסם בעצמו. בפרסום כל המודעות עולות ACTIVE.
