@@ -111,13 +111,27 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - Thumbnail: מה-poster (להוריד את `posterAssetId` ולהעלות כ-image/jpeg).
    - `rupload.facebook.com` פתוח בסביבה "מעקב מוצרים" (נבדק: HTTP 200).
 5. **אד-סט**: `adSetId`; אחרת למצוא ב-`ads_get_ad_entities` אד-סט בשם הקונספט בתוך קמפיין `TESTING | ABO | <מוצר>`. אם לא נמצא: `error` עם הסבר, ולא ליצור.
-6. `ads_create_creative` עם השדות הבאים:
-   - page_id=`410155838840115`, instagram_user_id=`17841462817997998`.
-   - video_id או image_hash.
-   - primary_texts: 2 הטקסטים של הזווית. headlines: 2 הכותרות. בלי descriptions.
-   - link_url: דף המוצר. CTA: ORDER_NOW. url_tags: ה-UTM. display_link: www.mayro-il.com.
-   - כל האופטימיזציות כבויות, וגם multi-advertiser ו-personalized destinations.
-7. `ads_create_ad` עם `ad_name=adName`, `advantage_plus_creative_defaults=OFF`, ו-`creative={"creative_id":"..."}`. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
+6. **אין לקרוא ל-`ads_create_creative`.** קריאייטיב שנוצר עם `primary_texts` מוצג ב-Ads Manager שבור: Media ריק, CTA "No button", אינסטגרם ריק, WhatsApp עם מספר הטלפון. התצוגה המקדימה תקינה, אבל העורך לא. **הפורמט שעובד ונראה נכון בעורך** הוא inline creative בפורמט Ads Manager, שמעבירים ישירות ל-`ads_create_ad` בשדה `creative` (JSON):
+```json
+{"object_story_spec":{"page_id":"410155838840115","instagram_user_id":"17841462817997998"},
+ "asset_feed_spec":{
+   "videos":[{"video_id":"<VIDEO_ID>","thumbnail_hash":"<THUMB_HASH>"}],
+   "bodies":[{"text":"<טקסט ראשי 1>"},{"text":"<טקסט ראשי 2>"}],
+   "titles":[{"text":"הקלה ביובש בעיניים תוך 5 דקות מהבית"},{"text":"30 ימי אחריות. לא אהבת? לא שילמת."}],
+   "link_urls":[{"website_url":"<דף המוצר>","display_url":"www.mayro-il.com"}],
+   "call_to_action_types":["ORDER_NOW"],
+   "ad_formats":["SINGLE_VIDEO"],
+   "optimization_type":"DEGREES_OF_FREEDOM"},
+ "url_tags":"utm_source={{site_source_name}}&utm_medium={{adset.name}}&utm_campaign={{campaign.name}}&utm_content={{ad.name}}",
+ "degrees_of_freedom_spec":{"creative_features_spec":{ ...כל 17 המאפיינים: OPT_OUT... }},
+ "wamo_whatsapp_identity_spec":{"wamo_whatsapp_identity_id":"410155838840115"},
+ "contextual_multi_ads":{"enroll_status":"OPT_OUT"}}
+```
+   - תמונה (Static Images): `"images":[{"hash":"<IMAGE_HASH>"}]` במקום `videos`, ו-`"ad_formats":["SINGLE_IMAGE"]`.
+   - `wamo_whatsapp_identity_spec` עם מזהה העמוד = "WhatsApp: Use Facebook Page". בלעדיו מטא מציבה את מספר הטלפון.
+   - בלי `descriptions`.
+   - נבדק על 3 המודעות הראשונות (עדכון בטיוטה עם `ads_update_entity` → `fields={"creative":{...}}`): עבר בלי שגיאות.
+7. `ads_create_ad` עם `ad_name=adName`, ו-`creative` = ה-JSON מסעיף 6. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
    - **מצב טיוטה (ברירת המחדל של אביאל)**: הקמפיין נשאר טיוטה בכוונה. אם האד-סט קיים רק בטיוטה (`ads_get_ad_entities` עם `object_state=draft`), `ads_create_ad` מכניס את המודעה לטיוטה ומחזיר `status=DRAFT`. לבדוק `active_errors` ולתקן עם `ads_update_entity`.
    - **לא לפרסם** (`ads_activate_entity` על הקמפיין) בלי בקשה מפורשת. אביאל מפרסם בעצמו. בפרסום כל המודעות עולות ACTIVE.
    - אחרי יצירה בטיוטה: `ads_update_entity` עם `{"status":"PAUSED"}` (נבדק, עובד בטיוטה), כך שגם אחרי פרסום המודעה תישאר כבויה.
