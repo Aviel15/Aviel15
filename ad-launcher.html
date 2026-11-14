@@ -863,7 +863,7 @@ $("#submitBtn").addEventListener("click", async () => {
 });
 
 /* ---------- queue ---------- */
-const ST = { pending:"ממתין", processing:"בעבודה", done:"עלה למטא", error:"שגיאה" };
+const ST = { pending:"ממתין להעלאה", processing:"בעבודה", done:"עלה למטא", error:"שגיאה" };
 $$("#qFilters button").forEach(b => b.addEventListener("click", () => {
   S.qFilter = b.dataset.f; $$("#qFilters button").forEach(x => x.setAttribute("aria-pressed", x===b?"true":"false")); renderQueue();
 }));
@@ -889,17 +889,15 @@ function renderQueue(){
     const body = h("div",{class:"q-body"},
       h("div",{style:"display:flex;gap:8px;align-items:center;justify-content:space-between"},
         h("div",{class:"q-title",text:q.adName || q.fileName || ""}),
-        (q.status === "pending" && q.scheduledAt && q.scheduledAt > Date.now())
-          ? h("span",{class:"pill processing"}, "מתוזמן")
-          : h("span",{class:"pill " + (q.status||"neutral")}, ST[q.status] || q.status || "")),
+        h("span",{class:"pill " + (q.status||"neutral")}, ST[q.status] || q.status || "")),
       meta);
-    if (q.scheduledAt) body.append(h("div",{class:"q-meta"},"עולה ב-" + fmtTime(q.scheduledAt)));
+    if (q.scheduledAt) body.append(h("div",{class:"q-meta"},"⏰ מתחילה לרוץ ב-" + fmtTime(q.scheduledAt)));
     if (q.note) body.append(h("div",{class:"q-meta"},"הערה: " + q.note));
     if (q.adId) body.append(h("div",{class:"q-meta mono"},"Ad ID: " + q.adId));
     if (q.error) body.append(h("div",{class:"q-err",text:q.error}));
     const actions = h("div",{class:"q-actions"});
     if (q.status === "error"){
-      actions.append(h("button",{class:"btn small",onclick:()=>db.collection("queue").doc(q.id).update({status:"pending",error:null}).then(()=>toast("חזר לתור"))},"נסה שוב"));
+      actions.append(h("button",{class:"btn small",onclick:()=>db.collection("queue").doc(q.id).update({status:"pending",error:null}).then(()=>pokeUploader("retry")).then(ok=>toast(ok ? "חזר לתור. קלוד מעלה עכשיו" : "חזר לתור. יעלה בבדיקה הקבועה"))},"נסה שוב"));
     }
     if (q.status === "pending" || q.status === "error"){
       const del = h("button",{class:"btn small danger"},"הסר");

@@ -25,7 +25,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 | חשבון מודעות | `800413478935513` (Mayro, ILS) |
 | עמוד ראשי | Mayro - מאיירו `410155838840115` |
 | עמודים נוספים | גברים אמיתיים ממליצים `1346342818559497` · אמהות בודקות וממליצות `1343145742209647` |
-| אינסטגרם | mayro.il, `instagram_user_id` = `17841460942215256` (נלקח מהקריאייטיבים הקיימים; `ads_get_ig_accounts` מחזיר ריק) |
+| אינסטגרם | mayro.il, `instagram_user_id` = `17841462817997998`. מחובר לחשבון המודעות, ו-`ads_get_ig_accounts` מחזיר אותו. מקור האמת הוא `config.igUserId` |
 | פיקסל | Mayro Pixel `780716898210630` |
 | דומיין | mayro-il.com, Domain ID `2929779687223296` |
 | חשבון מושבת | `619416970748434` (SMX) - לא לגעת |
@@ -65,7 +65,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 
 **Identity**:
 - Facebook Page: Mayro - מאיירו `410155838840115`.
-- Instagram profile: mayro.il `17841460942215256`.
+- Instagram profile: mayro.il `17841462817997998`.
 - Threads: Use Instagram account.
 - WhatsApp: Use Facebook Page.
 
@@ -112,7 +112,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
    - `rupload.facebook.com` פתוח בסביבה "מעקב מוצרים" (נבדק: HTTP 200).
 5. **אד-סט**: `adSetId`; אחרת למצוא ב-`ads_get_ad_entities` אד-סט בשם הקונספט בתוך קמפיין `TESTING | ABO | <מוצר>`. אם לא נמצא: `error` עם הסבר, ולא ליצור.
 6. `ads_create_creative` עם השדות הבאים:
-   - page_id=`410155838840115`, instagram_user_id=`17841460942215256`.
+   - page_id=`410155838840115`, instagram_user_id=`17841462817997998`.
    - video_id או image_hash.
    - primary_texts: 2 הטקסטים של הזווית. headlines: 2 הכותרות. בלי descriptions.
    - link_url: דף המוצר. CTA: ORDER_NOW. url_tags: ה-UTM. display_link: www.mayro-il.com.
@@ -120,6 +120,7 @@ description: ניהול והעלאת מודעות מטא של MAYRO (אביאל)
 7. `ads_create_ad` עם `ad_name=adName`, `advantage_plus_creative_defaults=OFF`, ו-`creative={"creative_id":"..."}`. אם יש `scheduledAt`, להעביר `ad_schedule_start_time` בפורמט ISO עם אזור זמן ישראל.
    - **מצב טיוטה (ברירת המחדל של אביאל)**: הקמפיין נשאר טיוטה בכוונה. אם האד-סט קיים רק בטיוטה (`ads_get_ad_entities` עם `object_state=draft`), `ads_create_ad` מכניס את המודעה לטיוטה ומחזיר `status=DRAFT`. לבדוק `active_errors` ולתקן עם `ads_update_entity`.
    - **לא לפרסם** (`ads_activate_entity` על הקמפיין) בלי בקשה מפורשת. אביאל מפרסם בעצמו. בפרסום כל המודעות עולות ACTIVE.
+   - אחרי יצירה בטיוטה: `ads_update_entity` עם `{"status":"PAUSED"}` (נבדק, עובד בטיוטה), כך שגם אחרי פרסום המודעה תישאר כבויה.
    - אם האד-סט כבר פורסם, המודעה נוצרת חיה ו-PAUSED. מפעילים עם `ads_activate_entity` רק אם `launchStatus=ACTIVE`.
    - לבדוק אם יש בטיוטה מודעות זבל שמטא יצרה אוטומטית ב-quick create (למשל "New Sales Ad": קרוסלת קטלוג, עמוד שגוי, SHOP_NOW). לא למחוק לבד. להתריע לאביאל.
 8. `update` ל-`done` עם `adId`, `creativeId`, `processedAt`. בשגיאה: `error` + `error` טקסט קצר בעברית.
